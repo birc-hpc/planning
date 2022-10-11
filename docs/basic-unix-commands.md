@@ -695,5 +695,8 @@ In `bash` I can do this:
 ~> diff <(sort qux) <(sort qax)
 ```
 
+The `<(…)` syntax tells `bash` that it should execute the command and treat the output as if it were a file. This syntax is not universal in different UNIX shells, but other shells usually have similar features, just with different syntax. In `bash`, though, it looks like that.
+
+
 
 [^1]:	You can create more pipes in various ways and use it to set up communication between running programs, but that is well beyond the scope of this introduction, so we will just leave it at the three our programs are born with.
