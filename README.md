@@ -25,7 +25,7 @@ Tentative schedule:
     - [ ] Exercises with submitting different kinds of jobs
 
  - **Week 06**
-    - [ ] Worklows (`gwf`)
+    - [ ] Workflows (`gwf`)
 
  - **Week 07**
     - [ ] *Project?*
