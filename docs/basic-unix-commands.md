@@ -1,12 +1,20 @@
 # A quick introduction to the UNIX command line
 
-**FIXME: THE STUFF BELOW ASSUMES FIGURES THAT I HAVE NOT INCLUDED WHEN I COPIED FROM CTIB. I NEED SOMETHING ELSE TO EXPLAIN WHAT THE SHELL LOOKS LIKE.**
+The basic interaction with all shells involves typing something into a *prompt*, the text highlighted in the figure below.
 
-The basic interaction with all shells involves typing something into a *prompt*. The prompt on all the figures is to the left of the cursor, the big rectangular block you can see on the last line (it isn't there on the lines where the shell has already evaluated a command). Prompts can be configured, so below I will use `~>` as the example prompt, but keep in mind that it will look different on your computer.
+**FIXME:** Make a picture of a shell as they will see it on the cluster.
 
-When you interact with your shell, you write a command at the prompt and then hit ENTER. (This should be familiar to most of you). Then the shell will interpret what you wrote, execute the command you gave it, and print the result.
+The prompt is what the shell writes to you, to indicate that it is ready to take the next command. To the right of it is your cursor, and there you can type in your commands. When you interact with your shell, you will write a command at the prompt and then hit ENTER. (This should be familiar to most of you). Then the shell will interpret what you wrote, execute the command you gave it, and print the result.
 
-How this work, in some more detail, is something we will learn in this class, but first, we will look at a few example commands.
+Prompts can be configured, so they look differently depending on which machine you are on, which jobs you are currently running, and a host of other factors, so I will not attempt to guess what the prompt will look like for you. The default on GenomeDK will be the host name in square brackets followed by a `$`, so for example
+
+```bash
+[fe-open-01]$
+```
+
+but this is only a default, and it will only look like this if you are on the machine `fe-open-01`.
+
+Below I will use `~>` as the example prompt, but keep in mind that it can look different on your computer.
 
 ## A few useful commands
 
@@ -34,7 +42,7 @@ The `ls` command you saw in the examples above lists the files in a directory. T
 
 You will find that the command takes an unreasonable number of options. The exact options depend a bit on which platform you are on, but there will be more than you care to study right now on all platforms. On my machine, the options are
 
-```
+```bash
 ls [-ABCFGHLOPRSTUW@abcdefghiklmnopqrstuwx1%] [file ...]
 ```
 
@@ -118,7 +126,7 @@ If you write
 
 you will have created a new file, `qux`, that contains the lines:
 
-```
+```bash
 foo
 bar
 baz

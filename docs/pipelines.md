@@ -1,13 +1,15 @@
 
 # Processes, files and pipes
 
-In the previous two weeks you have learned about how we communicated with a UNIX shell by typing in commands with arguments, and sometimes by using environment variables to affect how commands are run that way. This is how commands are usually run, but the UNIX command line adds two more idea, that turns out to be pure genius: pipes and standard pipes.
+By this point, you have learned about how we communicated with a UNIX shell by typing in commands with arguments, and sometimes by using environment variables to affect how commands are run that way. This is how commands are usually run, but the UNIX command line adds two more idea, that turns out to be pure genius: pipes and standard pipes.
 
 Pipes are basically just files. In UNIX there isn’t much difference and they are implemented basically the same way. Just as you can read from or write to a file, you can read from and write to a file. Files can do a little more; you can move around in a file and read and write at different positions, but with pipes you either always read the next character in it or you write characters to it. That is the only difference.
 
 When a program is running, it automatically gets three of these pipes.[^1] The three pipes are “standard input” or `stdin`, “standard output”, `stdout`, and “standard error”, `stderr`. The program can read from `stdin` and write to either of `stdout` or `stderr`. The way they are intended to be used is: any input that your program needs it can read from `stdin`—most program will use files you specify in the arguments, but they *should* also be able to read it from this pipe—and any output the program needs to write, it should write to `stdout`. The `stderr` is there if the program needs to write error or warning messages that shouldn’t be mixed with the actual output sent to `stdout`.
 
 ![Command with pipes.](img/process-with-pipes.png)
+
+[^1]: You can create more pipes in various ways and use it to set up communication between running programs, but that is well beyond the scope of this introduction, so we will just leave it at the three our programs are born with.
 
 I will ignore `stderr` in the following, since we only need it when something goes wrong (and why would something go wrong?).
 
@@ -334,6 +336,4 @@ In `bash` I can do this:
 ~> diff <(sort qux) <(sort qax)
 ```
 
-The `<(…)` syntax tells `bash` that it should execute the command and treat the output as if it were a file. This syntax is not universal in different UNIX shells, but other shells usually have similar features, just with different syntax. In `bash`, though, it looks like that.
-
-[^1]: You can create more pipes in various ways and use it to set up communication between running programs, but that is well beyond the scope of this introduction, so we will just leave it at the three our programs are born with.
+The `<(…)` syntax tells `bash` that it should execute the command and treat the output as if it were a file. This syntax is not universal, it will not work in all UNIX shells, but other shells usually have similar features, just with different syntax. In `bash`, though, it looks like that.

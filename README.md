@@ -4,16 +4,17 @@ Tentative schedule:
 
 - **Week 01**
   - [ ] Getting an account on [genome.au.dk](https://genome.au.dk), logging in using `ssh`.
-  - [ ] Cluster architecture (your computer, frontend, nodes, ...)
-  - [x] [Basic UNIX command line and Navigating the file system](docs/basic-unix-commands.md)
+  - [ ] [Cluster architecture (your computer, frontend, nodes, ...)](docs/architecture.md)
+  - [x] [Basic UNIX command line](docs/basic-unix-commands.md)
+  - [ ] [Navigating the file system](docs/navigating-file-system.md)
 
 - **Week 02**
   - [ ] Getting files and software (conda, scp, rsync, wget, git)
   - [ ] Editing files, mount, VSCode
-  - [ ] More UNIX commands. Variables.
+  - [x] [Pipelines (stdin/stdout/pipelines)](docs/pipelines.md)
+  - [ ] [Shell and environment variables.](docs/variables.md)
 
 - **Week 03**
-  - [ ] [Pipelines (stdin/stdout/pipelines)](docs/pipelines.md)
   - [ ] BASH programming
 
 - **Week 04**
