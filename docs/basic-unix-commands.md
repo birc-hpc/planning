@@ -1,4 +1,4 @@
-# The anatomy of a typical UNIX command
+# A quick introduction to the UNIX command line
 
 **FIXME: THE STUFF BELOW ASSUMES FIGURES THAT I HAVE NOT INCLUDED WHEN I COPIED FROM CTIB. I NEED SOMETHING ELSE TO EXPLAIN WHAT THE SHELL LOOKS LIKE.**
 
@@ -268,3 +268,37 @@ qax:foo
 ```
 
 The countless options you can give `grep` can change how it outputs it findings, whether it prints the lines where it finds `word` or just which files it found `word` in, ,whether it should output the files it *didn’t* find `word` in instead, and so on. It is one of the most useful search commands you have at your disposal on the command line, once you learn how to use it.
+
+## The anatomy of a typical UNIX command
+
+I know that it all looks confusing and overwhelming at this point. You’ve seen a tiny fraction of the commands you have available in a shell, and all of them take an obscene number of options, and there is no way that you can remember the commands or the options. Luckily, with `man` you don’t have to remember the options, but if you don’t know the name of a command, `man` is of no use.
+
+It *is* overwhelming; it *is* confusing. It is not just you. There *are* too many commands to remember, and every time someone writes a new tool, yourself included, there is one more command to add to the toolbox.
+
+Have no fear, though. It is just like learning a new language. A new language contains tens or hundreds of thousands of words and you need to learn a lot of them before you can speak the language, and at least you have fewer words on the command line than in English, Swahili or Dutch.
+
+The more you use the language, the more words you will learn, and soon you will speak a passable command line, if not yet completely fluent. The only thing you need to do to keep learning is to, whenever you want to do something, X, ask the question: “how do I do X in my shell?”. You can ask me, you can ask a friend, and Google is your friend if you have no others. Slowly but surely you will increase your vocabulary.
+
+Luckily, the grammar is much simpler for a shell than a natural language. It is more complicated than I will show you here—and each shell is a separate language with its own grammar when it comes to the more complicated stuff—but it is simpler than the natural languages you already speak.
+
+I will show you the basic grammar, though, and illustrate how a simple grammar gives you a powerful language.
+
+We start with the grammar for a single command. You’ve seen several examples above. A command looks like this:
+
+```bash
+~> some-command arg1 arg2 arg3 …
+```
+
+There is a command at the beginning, `some-command`, and then zero or more arguments, `arg1 arg2 arg3 …`
+
+When you write a command like that, the shell will find a program called `some-command` and execute it, giving it the arguments. Some strings you can’t use as arguments, we will see most of them below, because the shell will interpret them as commands to itself rather than the program, but generally it just gives the program the arguments.
+
+What the program does with the arguments is entirely up to the program. The shell doesn’t know, nor does it care. That is the program’s responsibility. The way to find out what they mean is using `man some-command`.
+
+When you write your own programs, you have access to the arguments that a user provides on the command line. Where you have them depends on the programming language you use, and I will show you how to get at them in Python, the language we use for this class, next week.
+
+Anyway, when you execute a command, you will be running a program, and that program gets the arguments you provided.
+
+![Process with arguments.](img/process-with-args.png)
+
+With this alone, we would have a useful interface to running commands. We can call any program by putting it first in a command, and we can give the program any arguments it needs using the following values. If a command needs to read or write files, we can specify file names as arguments, and it will be able to find the files, either relative to the working directory or using an absolute path.
