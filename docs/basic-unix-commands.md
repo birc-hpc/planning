@@ -1,5 +1,7 @@
 # The anatomy of a typical UNIX command
 
+**FIXME: THE STUFF BELOW ASSUMES FIGURES THAT I HAVE NOT INCLUDED WHEN I COPIED FROM CTIB. I NEED SOMETHING ELSE TO EXPLAIN WHAT THE SHELL LOOKS LIKE.**
+
 The basic interaction with all shells involves typing something into a *prompt*. The prompt on all the figures is to the left of the cursor, the big rectangular block you can see on the last line (it isn't there on the lines where the shell has already evaluated a command). Prompts can be configured, so below I will use `~>` as the example prompt, but keep in mind that it will look different on your computer.
 
 When you interact with your shell, you write a command at the prompt and then hit ENTER. (This should be familiar to most of you). Then the shell will interpret what you wrote, execute the command you gave it, and print the result.
@@ -8,7 +10,7 @@ How this work, in some more detail, is something we will learn in this class, bu
 
 ## A few useful commands
 
-This will not be a tutorial of most useful commands you will want to know, you will pick those up with time if explore the UNIX environment as you work on exercises and projects, but I will show you a few to get you started.
+This will not be a tutorial of most useful commands you will want to know, you will pick those up with time if you explore the UNIX environment as you work on exercises and projects, but I will show you a few to get you started.
 
 ### man
 
