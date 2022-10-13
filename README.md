@@ -17,7 +17,7 @@ Tentative schedule:
   - [ ] BASH programming
 
 - **Week 04**
-  - [ ] *Reproducable research?*
+  - [ ] *Reproducible research?*
 
 - **Week 05**
   - [ ] Queue system (submit, status, log, ...)

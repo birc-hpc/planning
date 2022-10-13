@@ -1,18 +1,16 @@
-# Introduction to the UNIX shell
-
-## The anatomy of a typical command
+# The anatomy of a typical UNIX command
 
 The basic interaction with all shells involves typing something into a *prompt*. The prompt on all the figures is to the left of the cursor, the big rectangular block you can see on the last line (it isn't there on the lines where the shell has already evaluated a command). Prompts can be configured, so below I will use `~>` as the example prompt, but keep in mind that it will look different on your computer.
 
 When you interact with your shell, you write a command at the prompt and then hit ENTER. (This should be familiar to most of you). Then the shell will interpret what you wrote, execute the command you gave it, and print the result.
 
-How this work, in some more detail, is what we will learn in this exercise, but first, we will look at a few example commands.
+How this work, in some more detail, is something we will learn in this class, but first, we will look at a few example commands.
 
-### A few useful commands
+## A few useful commands
 
 This will not be a tutorial of most useful commands you will want to know, you will pick those up with time if explore the UNIX environment as you work on exercises and projects, but I will show you a few to get you started.
 
-#### man
+### man
 
 The most useful command to know is `man`, short for *manual*. This is where you get information about the tools you have. If you write
 
@@ -24,7 +22,7 @@ you get the manual for the `man` command.
 
 Back in the good old days, all tools would have a manual page that described them, and all the old tools still do. Unfortunately, this isn’t true for many modern bioinformatics tools, where you have to run the tool with a flag such as `-h` or `--help` to get the same information, but that is a worry for another day. For the commands I will show you in this exercise, `man` will give you a description. Use this command to learn more about the various tools and commands.
 
-#### ls
+### ls
 
 The `ls` command you saw in the examples above lists the files in a directory. Try the command
 
@@ -56,7 +54,7 @@ If you give it options, which will typically be directories, it will list those.
 
 will list the file or directory `foo`. If `foo` is a file, it will just list `foo`, and if `foo` is a directory it will list all the files in it.
 
-#### mkdir, touch and rm
+### mkdir, touch and rm
 
 Try running these commands:
 
@@ -97,7 +95,7 @@ A command such as `rm -r foo` gives us a common pattern for instructions to a sh
 
 We will see how to write tools that take arguments, and how to parse the arguments as flags and options, in some of the later exercises and projects.
 
-#### echo
+### echo
 
 The command `echo` prints the arguments you give it:
 
@@ -126,7 +124,7 @@ baz
 
 The magic happens with the symbol `>`, and it isn’t actually `echo` doing the magic but the shell. When we write this, we redirect the output of the command to the left of `>` into the file on the right. We return to this in a little bit.
 
-#### cat, more and less
+### cat, more and less
 
 The `cat` command con*cat*tenates files.
 
@@ -185,7 +183,7 @@ This, however, doesn’t work with PowerShell. We can get a similar effect in a 
 
 For `cat`, this isn’t useful in itself; we get exactly the same effect by calling `cat qux` as `cat < qux`, but it has its uses as we shall also see shortly.
 
-#### cmp and diff
+### cmp and diff
 
 If you want to see if two files are identical—you can probably imagine that this can be useful—two tools are particularly useful. The `cmp` command will tell you if two files are the same. It will print that they are different if they are
 
@@ -244,7 +242,7 @@ baz     baz
       > bar
 ```
 
-#### grep
+### grep
 
 The `grep` command lets you search in files. The name has a weird mnemonic, `grep` stands for “global, regular expression, print”, a name that made perfect sense in the Elder Days where it was a command you could give the `ed` editor, but today it is pure nonsense. Instead, `grep` has become a verb in its own right, and you will hear programmers talk about “grepping” for stuff.
 
@@ -268,51 +266,3 @@ qax:foo
 ```
 
 The countless options you can give `grep` can change how it outputs it findings, whether it prints the lines where it finds `word` or just which files it found `word` in, ,whether it should output the files it *didn’t* find `word` in instead, and so on. It is one of the most useful search commands you have at your disposal on the command line, once you learn how to use it.
-
-## Navigating the file system
-
-I won’t say much about the file system. You already know how the file system consist of a hierarchy of directories and files. The only thing to add to this, when it comes to shells, is that we have something called the *current (working) directory*, and all commands are relative to that place.
-
-The command `pwd` will show you where the shell’s current working directory is. You get a string of `/`-separated names. The slash is used to separate directories on UNIX (you might be used to backslash on Windows). Whenever you provide a file-name to a command, it will be interpreted in one of two ways.
-
-An *absolute* path to the file—any file-name that starts with a `/` is absolute, and the path—the string of `/`-separated names is interpreted as starting in the root of your file system. What that is, depends on your platform.
-
-A *relative* path is one that doesn’t start with a `/`. Those will be interpreted as a path that starts in the current working directory and relative to that.
-
-So, when we wrote `cat qux` we used a relative path. We gave `cat` the `qux` file in the current directory. Earlier, when we did `touch foo/bar` we also used a relative path. We specified the directory `foo` in the current directory, and then the file `bar` inside that `foo` directory.
-
-In addition to this, there are two special names, `.` and `..`. A single dot, `.`, always refers to the current directory. So if we wrote `cat ./qux` we would explicitly say that we wanted the `qux` in the current directory. There are some situations where it is necessary to specify `./qux` instead of `qux`, but we won’t go into that here.
-
-The two dots, `..`, refers to the parent of a directory. If we wrote `cat ../foo` we would be looking for the `foo` file not in this directory but in the directory one up.
-
-Try running these commands and see what you get:
-
-```bash
-~> ls .
-~> ls ..
-```
-
-The two dots can be used inside a path, so if we wrote
-
-```bash
-~> mkdir foo
-~> ls foo/..
-```
-
-we would ask `ls` to list the parent directory of `foo` (which would be the same as the current directory.
-
-To change directories you use the command `cd`. It takes a path as an argument, so you can change the current directory to the sub-directory `foo` using
-
-```bash
-~> cd foo
-```
-
-and then go back to the original directory with
-
-```bash
-~> cd ..
-```
-
-If you use `cd` with arguments, you will be send to your home directory, whatever that is. It depends on your platform, and it isn’t an important concept on a personal computer, but it is if you get an account on a shared system like our GenomeDK cluster. The home directory is the root of all your own files, kept separated from other users’ files.
-
-Try using `cd` to move around the directory hierarchy, and every time you end up somewhere new, use `pwd` to see where the shell thinks that you are.
