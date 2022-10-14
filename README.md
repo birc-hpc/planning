@@ -6,7 +6,7 @@ Tentative schedule:
   - [ ] Getting an account on [genome.au.dk](https://genome.au.dk), logging in using `ssh`.
   - [ ] [Cluster architecture (your computer, frontend, nodes, ...)](docs/architecture.md)
   - [x] [Basic UNIX command line](docs/basic-unix-commands.md)
-  - [ ] [Navigating the file system](docs/navigating-file-system.md)
+  - [x] [Navigating the file system](docs/navigating-file-system.md)
 
 - **Week 02**
   - [ ] Getting files and software (conda, scp, rsync, wget, git)
