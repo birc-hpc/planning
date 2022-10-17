@@ -1,4 +1,9 @@
-# More on UNIX commands
+# Scripts and variables
+
+- How to make a simple script (putting commands in a file, the `#!`-line).
+- Adding arguments to the script (variables `$@ $1 $2` and such)
+- General variables (just an example where we use a better name)
+- Variables and environment variables--what's the difference (inheriting variables from the parent process)
 
 **FIXME:** just copied some stuff here that I might need later
 
