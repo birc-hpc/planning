@@ -281,7 +281,100 @@ If you have done that, UNIX has permission to execute the file, and since we hav
 ~> ./backup.sh
 ```
 
+## Cleaning up the script using a variable
 
+Let’s have a look at the script again:
+
+```bash
+#!/bin/bash
+
+mkdir results-$( date +%F )
+cp $( cat important.txt ) results-$( date +%F )
+tar -czf results-$( date +%F ).tar.gz results-$( date +%F )
+rm -r results-$( date +%F )
+cp results-$( date +%F ).tar.gz backup
+```
+
+We have `$( date +%F )` a lot in there… is that safe? Well, if we are careful not to use another date format accidentally, they should all evaluate to the same string. Unless you run the script around midnight, then it will change halfway through. And it will definitely break sooner or later if you want to include the clock in the format.
+
+```bash
+~> date +%F-%H-%M
+2022-10-18-14-00
+```
+
+Can we fix this so we only generate the string once and then reuse it elsewhere? Of course, we can! We’re script kiddies now.
+
+If you do this, the result of the `date` command is written to the *variable* date
+
+```bash
+~> date=$( date +%F-%H-%M )
+~> echo $date
+2022-10-18-14-02
+```
+
+The `date` command is run as in our script, and using `$( … )`, we get the output. When we assign the result to the variable `date`:
+
+```bash
+date=$( date +%F-%H-%M )
+```
+
+we create a new variable, `date`, and we can get its value with `$date`. It won’t interfere with the `date` command, don’t worry about that. If we write `date`, it is the command, but if we put a dollar in front of it, `$date`, it is the value in the variable.
+
+We can use this in our script to avoid calling the `date` command more than once:
+
+```bash
+#!/bin/bash
+
+# Get the current date
+date=$( date +%F )
+
+# Collect files, zip them up, and save a backup
+mkdir results-$date
+cp $( cat important.txt ) results-$date
+tar -czf results-$date.tar.gz results-$date
+rm -r results-$date
+cp results-$date.tar.gz backup
+```
+
+We get the `date` string at the top of the string with:
+
+```bash
+date=$( date +%F )
+```
+
+Everywhere else, we use `$date` to get the string without rerunning the command.
+
+Notice that I have also added some comments. We might as well exploit that bash won’t execute whatever we write after a `#`.
+
+Incidentally, this variable can show you one of the differences between sourcing and running a script in a new shell (as a `#!`-script or by calling `bash` with it as its argument).
+
+Get rid of the variable if you have accidentally set it
+
+```bash
+~> unset date
+```
+
+Now run the script in its own shell, and check if you have something in the variable:
+
+```bash
+~> ./backup.sh
+~> echo $date
+
+```
+
+Nope, it is empty. Try with sourcing the file instead:
+
+```bash
+~> source backup.sh
+~> echo $date
+2022-10-18
+```
+
+This time it is here!
+
+The variables we set in a shell are local to it. If we source, we run the commands in our current shell, so the variables we set will remain set after the script is done. If we run the file as a script, however, it runs in another shell, and what variables are set there will not affect the shell we are interacting with right now.
+
+There is a twist to that, called *environment variables*, but we return to those later. **FIXME: continue**
 
 ----
 
@@ -290,11 +383,8 @@ If you have done that, UNIX has permission to execute the file, and since we hav
 ----
 
 - make `backup` dir if it isn't there
-- use a variable for the date
 
 ----
-
-- More on comments
 
 - Adding arguments to the script (variables `$@ $1 $2` and such)
 - General variables (just an example where we use a better name)

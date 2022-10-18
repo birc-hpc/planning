@@ -1,7 +1,11 @@
 #!/bin/bash
 
-mkdir results-$( date +%F )
-cp $( cat important.txt ) results-$( date +%F )
-tar -czf results-$( date +%F ).tar.gz results-$( date +%F )
-rm -r results-$( date +%F )
-cp results-$( date +%F ).tar.gz backup
+# Get the current date
+date=$( date +%F )
+
+# Collect files, zip them up, and save a backup
+mkdir results-$date
+cp $( cat important.txt ) results-$date
+tar -czf results-$date.tar.gz results-$date
+rm -r results-$date
+cp results-$date.tar.gz backup
