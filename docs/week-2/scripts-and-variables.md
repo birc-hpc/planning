@@ -1,5 +1,7 @@
 # Scripts and variables
 
+A toolbox of commands, and familiarity with how to string them together in pipelines, is the bread and butter of day to day interaction with the UNIX system, it has its limitations.
+
 - How to make a simple script (putting commands in a file, the `#!`-line).
 - Adding arguments to the script (variables `$@ $1 $2` and such)
 - General variables (just an example where we use a better name)

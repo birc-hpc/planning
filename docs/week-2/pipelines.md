@@ -7,7 +7,7 @@ Pipes are basically just files. In UNIX there isn’t much difference and they a
 
 When a program is running, it automatically gets three of these pipes.[^1] The three pipes are “standard input” or `stdin`, “standard output”, `stdout`, and “standard error”, `stderr`. The program can read from `stdin` and write to either of `stdout` or `stderr`. The way they are intended to be used is: any input that your program needs it can read from `stdin`—most program will use files you specify in the arguments, but they *should* also be able to read it from this pipe—and any output the program needs to write, it should write to `stdout`. The `stderr` is there if the program needs to write error or warning messages that shouldn’t be mixed with the actual output sent to `stdout`.
 
-![Command with pipes.](img/process-with-pipes.png)
+![Command with pipes.](img/processes/process-with-pipes.png)
 
 [^1]: You can create more pipes in various ways and use it to set up communication between running programs, but that is well beyond the scope of this introduction, so we will just leave it at the three our programs are born with.
 
@@ -17,13 +17,13 @@ For an example of how this works, consider the shell. It is a program that takes
 
 When you type something on the keyboard, what you type is sent to the shell to its standard input. When the shell needs to write something back to you, it writes it to its standard output (or error).
 
-![Shell with pipes.](img/shell.png)
+![Shell with pipes.](img/processes/shell.png)
 
 The shell doesn't need to know if it is getting its input from another program (like the terminal program you are running) or from hardware (as in the good old days), and it doesn't need to know who is reading what it writes to `stdout`. It just writes. This decouples the shell from its surroundings in various ways, and is the reason that we can use the same shells today with terminal programs as people could in the '70s with hardware terminals, and why you can combine any terminal program with any shell with little if any difficulty. The two pipes is the interface to and from a program, and we don't need to write specialised code based on what might be at the other ends of them.
 
 When we called `cat` without any arguments earliere, a long time ago I know, I said that `cat` would then be reading from `stdin`. It will, but the `cat` program's `stdin` is connected to the keyboard you are writing on so it can see what you type. When you run a command in the shell, it will connect its own `stdin` to the command's `stdin`, so what you type gets forwarded to the command you run. Similarly, it will connect the command's `stdout` to its own, so what the command prints will be sent to whatever program or hardware or whatever it may be that the shell would have been printing to.
 
-![Running \`cat\` in a shell.](img/shell-cat.png)
+![Running \`cat\` in a shell.](img/processes/shell-cat.png)
 
 This isn't that interesting in itself, though. You could think of it as an implementation detail that you shouldn't have to think about. However, there is one more clever trick up our sleeve: you can connect output pipes to input pipes to run data through a sequence of programs.
 
@@ -50,7 +50,7 @@ When `echo` prints its output, it does so to its `stdout`, and if you call `wc` 
        3       3      12
 ```
 
-![\`echo\` piped to \`wc\`.](img/echo-wc.png)
+![\`echo\` piped to \`wc\`.](img/processes/echo-wc.png)
 
 The `echo` program doesn't know what is at the other end of its `stdout`. It is just a kind of file that it can write to. The `wc` program doesn't know what is at the other end of `stdin`, it just knows that it can read from that pipe. When I connect the two commands using the pipe operator, I connect the first command's `stdout` to the second command's `stdin`, and now whatever the output of the first command is, it will be the input to the second command. Such sequences of commands are called "pipelines" for obvious reasons.
 
