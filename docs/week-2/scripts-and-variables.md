@@ -396,7 +396,7 @@ There is a twist to that, called *environment variables*, but we return to those
 
 ## Working with variables and script arguments
 
-Generally, the way you use variables is that yoy can *set* them:
+Generally, the way you use variables is that you can *set* them:
 
 ```bash
 ~> var=value
@@ -416,15 +416,15 @@ The variables are textual, and if you are familiar with other programming langua
 2 + 2
 ```
 
-If you expected two plus two to equal four here, that is the confusion I am talking about. The variable `x` contains the *string* `2`, and when we get its value, we are just getting text.
+If you expected two plus two to equal four here, that is the confusion I am talking about. The variable `x` contains the *string* `2`, and when we get its value, we are just getting the text.
 
 There are ways to evaluate expressions, but they are a topic for another note. For now, just keep in mind that variables generally contain text, and when you extract values, you are doing text substitution.
 
 There are [a lot of complicated rules](https://www.gnu.org/software/bash/manual/bash.html#Shell-Parameter-Expansion) for modifying how a variable is expanded, but you don't use them often, so don't bother memorising them. If you need something, google it, and work it out from there. If you try to learn the rules now, chances are that you will never ever need it, so that will be a waste of time.
 
-However, one you will definitely run into, looks like this: `${var}`.
+However, one you will definitely run into looks like this: `${var}`.
 
-Here, the variable is in curly brackets. The various expansion rules will look like that. This one, however, is simple. If you put the variable name in curly backets it expands to the same as if you didn't.
+Here, the variable is in curly brackets. The various expansion rules will look like that. This one, however, is simple. If you put the variable name in curly brackets, it expands to the same as if you didn't.
 
 ```bash
 ~> var=hello
@@ -432,7 +432,7 @@ Here, the variable is in curly brackets. The various expansion rules will look l
 hello hello
 ```
 
-If the curly backets don't do anything, why use them? Well, it is handy if you want to expand a variable inside a text, like this:
+If the curly brackets don't do anything, why use them? Well, it is handy if you want to expand a variable inside a text like this:
 
 ```bash
 ~> x=foo
@@ -440,11 +440,11 @@ If the curly backets don't do anything, why use them? Well, it is handy if you w
 First: '', second 'foobar'
 ```
 
-The string `$xbar` refers to the variable `xbar`, which doesn't exist and thus is expanded to an empty string. On the other hand, the string `${x}bar` refers to the variable `x` and then the string `bar`, and when `x` is expanded we get `foobar`.
+The string `$xbar` refers to the variable `xbar`, which doesn't exist and thus is expanded to an empty string. On the other hand, the string `${x}bar` refers to the variable `x` and then the string `bar`, and when `x` is expanded, we get `foobar`.
 
 If you need a variable inside some text, such that the whole string could be confused for a variable name, then use `${...}`.
 
-If you now get the idea that you can put variables in quoted strings, you are right. With one caveat. If the string is quoted with double-quotes, the variable will be expanded.
+If you now get the idea that you can put variables in quoted strings, you are correct with one caveat. If the string is quoted with double quotes, the variable will be expanded.
 
 ```bash
 ~> echo "Hello $x"
@@ -482,9 +482,9 @@ Any UNIX process has a list of arguments, from one and up. Not zero, but one, be
 
 ![Process with arguments](img/processes/process-with-args.png)
 
-How different languages deal with arguments can vary, but bash was built for UNIX and it has the same philosophy. When you are running a shell script, the variable `$0` will hold the name of the scritp, `$1` is the first argument you gave the script, `$2` is the second, and so on. In addition to this, if you want an expansion of *all* the arguments (excluding the script name) you can use `$@`, and if you want the number of arguments (also excluding the script name) you can use `$#`. Try it with this script (and remember to give it execution permission):[^1]
+How different languages deal with arguments can vary, but bash was built for UNIX, and it has the same philosophy. When you are running a shell script, the variable `$0` will hold the script’s name, `$1` is the first argument you gave the script, `$2` is the second, and so on. In addition, if you want an expansion of *all* the arguments (excluding the script name), you can use `$@`, and if you want the number of arguments (also excluding the script name), you can use `$#`. Try it with this script (and remember to give it execution permission):[^1]
 
-[^1]: The `\"...\"` might look odd, but this is what it is doing: I wanted to put the list of arguments in quotes. If I just use `"..."` I get a string, containing the list of arguments, and that would expand to just the arguments. I would lose the quotes. But by *escaping* the quotes with backslash I tell bash to use the literal symbol, so it will include the two quotes in the output, instead of trying to be clever about it and interpret it as a string.
+[^1]: The `\"...\"` might look odd, but this is what it is doing: I wanted to put the list of arguments in quotes. If I just use `"..."` I get a string containing the list of arguments, and that would expand to just the arguments. I would lose the quotes. But by *escaping* the quotes with a backslash, I tell bash to use the literal symbol, so it will include the two quotes in the output instead of trying to be clever about it and interpret it as a string.
 
 ```bash
 #!/bin/bash
@@ -496,7 +496,7 @@ echo Argument 2: $2
 echo Argument 3: $2
 ```
 
-The `$@` and `$#` variables have horribly names. I don't know why shell people insist on using what looks like line noise for variables, but they do. It is what it is, though. At least it is fairly easy to remember the positional arguments.
+The `$@` and `$#` variables have horrible names. I don't know why shell people insist on using what looks like line noise for variables, but they do. It is what it is, though. At least it is reasonably easy to remember the positional arguments.
 
 Let's try to add arguments to our backup script. Maybe we have decided that we want to use it in other projects, so we want to add an option for where the script should run, where the file that contains the list of other files to back up is, and where the backup directory is. We still want to be able to run the script without arguments as before, so we add default arguments to all the options. That could look like this:
 
@@ -526,6 +526,386 @@ tar -czf results-$date.tar.gz results-$date
 rm -r results-$date
 mkdir -p $backup && cp results-$date.tar.gz $backup
 ```
+
+We use variables `$1`, `$2`, and `$3` to specify the working directly, the "important file”, and the backup directory, and for all three, if they are not set (which happens if the user provided fewer arguments than we expected), we use a default.
+
+One way to deal with this is to have optional arguments, similar to the options you have seen in many commands so far. Unfortunately, this is unusually ugly to get in bash, so the next step will be quite a mouthful. Mainly because I see it as an excuse to throw in a lot of other new stuff...
+
+## Parsing options, functions, and miscellaneous other stuff
+
+We are going to update our script, so it takes optional arguments for specifying the directory to work in, the “important files file”, and the backup directory. Knowing that we are a forgetful bunch, we probably need to be reminded of which arguments the script takes, so we also want it to give us a helpful error message if we mess it up and maybe an even more helpful message if we explicitly ask for help.
+
+If we give the script an option it doesn’t know about, we want this to happen:
+
+```bash
+~> ./backup.sh -x
+./backup.sh: illegal option -- x
+Unknown option ?
+Usage: ./backup.sh
+          -h              display help
+          -d directory    set working directory
+          -i file         file containing files to backup
+          -b directory    where to backup
+```
+
+If we give it the option `-h` we want a longer message:
+
+```bash
+~> ./backup.sh -h
+Tool for backing up important files.
+
+Will create a tarbal with important files, with a date stamp,
+and copy it to a directory of your choice.
+
+    -d directory
+    Set in which directory to run
+
+    -i file
+    Specify in which file we can get the list of what
+    to back up.
+
+    -b directory
+    Specify in which directory we should place the backup
+```
+
+Ok, maybe it is not the best prose you have ever read, but I didn’t study English, so shut up. You can write your own messages once the lesson is over.
+
+To do that, you will need to update this bit of the new script:
+
+```bash
+# Function for showing usage
+function usage() {
+    echo "Usage: $0
+          -h              display help
+          -d directory    set working directory
+          -i file         file containing files to backup
+          -b directory    where to backup
+    "
+    exit
+}
+
+# Function for showing help (shorter usage)
+help() {
+    echo "Tool for backing up important files.
+
+Will create a tarbal with important files, with a date stamp,
+and copy it to a directory of your choice.
+    
+    -d directory
+    Set in which directory to run
+    
+    -i file
+    Specify in which file we can get the list of what
+    to back up.
+    
+    -b directory
+    Specify in which directory we should place the backup
+    "
+    exit
+}
+```
+
+These are two *functions*: `usage` and `help`. Functions are another way to add commands to bash, and they are not entirely unlike scripts. You write a function name, parentheses, and then in curly brackets, the commands you want to run when you use the function as a command.
+
+We defined
+
+```bash
+function usage() {
+	...
+}
+
+help() {
+	...
+}
+```
+
+and you might wonder why it says `function` before `usage` and not before `help`. Because I could show you that `function` is optional, that’s why. You can add it, if you want to make it explicit that you are defining a function, or you can leave it out if you don’t care.
+
+Inside the function are the commands we want the functions to run, and there is nothing new in how that works. We use the `echo` command to write a message, and you have seen that one many times before. Then we use the `exit` command to terminate. This command will terminate the current shell (so don’t write it in your current shell), which for shell scripts means that it will terminate the entire script. That is exactly what we want here. There are other ways to leave a function that doesn’t involve shutting down the entire script, but that is a topic for another day.
+
+If you want to run `usage`, just invoke it as a command
+
+```bash
+~> usage
+```
+
+It won’t work unless you have defined it in your current shell, and if you run it, it will close the shell, so don’t do that. Try starting a new shell, paste the function definition in, and then run it.
+
+```bash
+~> bash  # starts a new shell. When it closes you go back here
+~> usage() {
+...
+~> }
+~> usage # run this to see what happens
+```
+
+Ok, those were the messages. Now comes the ugly part—we need to parse the options.
+
+Bash has a command called `getopts` that can do this for us. There is another command, called `getopt`, that does the same but in a completely different way, so make sure you use the one that ends in ’s’, or the following won’t work (but you might learn how to use the other one if you try).
+
+The option parsing looks like this:
+
+```bash
+while getopts hd:i:b: flag; do # get one option at a time
+    case $flag in
+        h) # -h flag
+            help  # Display help message and exit
+            ;;
+
+        d) # -d flag
+            dir=$OPTARG
+            ;;
+
+        i) # -i flag
+            important_file=$OPTARG 
+            ;;
+
+        b) # -b flag
+            backup=$OPTARG
+            ;;
+
+        ?) # anything else
+            usage  # is an error, so show usage and stop
+            ;;
+    esac # end of case
+done
+```
+
+If you don’t understand a word of this, don’t worry. We will see more of these kinds of things in a later session. For now, I will try to give a brief explanation.
+
+The `getopts` command takes two options, `hd:i:b:` and `flag`. The latter is just the name of a variable we want it to write the option into. When it sees a flag such as `-h`, it will write it into `flag`, and we can get it as `$flag`. The `hd:i:b:` looks weirder, but it is just a list of the options we want it to handle.
+
+The `getopts` command can only handle single-letter flags, så things like `-h` or `-d`, but not long flags such as `--help` or `--directory`. If you want that, you need `getopt`, or you need a hack that you can learn at a later point. So the format for option specification is a sequence of letters, `hdib`. The colons you add when you want a flag to take an argument. For `-d`, `-i`, and `-b`, we want an argument—a directory, file, and directory, respectively—so we put `:` after those.
+
+When we call `getopts hd:i:b: flag`, it will parse the script arguments, figure out what the first flag is, and put it in `flag`. It then terminates with the status `0` to indicate that it managed to parse one option. If there are no more options, it will return a non-zero status. The `while` loop works by repeatedly executing the command until the status is non-zero, so combining these two we get that
+
+```bash
+while getopts hd:i:b: flag; do # get one option at a time
+    ...
+done
+```
+
+will run as long as `getopts` can find flags. For each flag, the stuff between `while` and `done` is executed.
+
+Inside the `while` loop we use a `case` on `$flag`.
+
+```bash
+    case $flag in
+			...
+    esac # end of case
+```
+    
+This construction will test the value in `$flag` against various options. Each option looks like
+
+```bash
+        something-to-match)
+            Something to do when we match.
+            This will be the commands we want
+            to run.
+            ;;  # <- ;; means the end of the case
+```
+
+The `case` construction will compare the flag against whatever is in the `something-to-match` fields, the stuff to the left of `)`, and if it finds a match it will run the stuff following the `)` and forward to `;;`. We have put the options we recognise as different fields.
+
+If we see the flag `-h`, then `$flag` will be set to `h` (without the dash), so we can match on that and print help (by invoking the `help` function):
+
+```bash
+        h) # -h flag
+            help  # Display help message and exit
+            ;;
+```
+
+For the other flags, we set a variable to the flag’s argument. That argument will be in the variable `$OPTARG`. This variable is automatically set by `getopts`.
+
+```bash
+        d) # -d flag
+            dir=$OPTARG
+            ;;
+
+        i) # -i flag
+            important_file=$OPTARG 
+            ;;
+
+        b) # -b flag
+            backup=$OPTARG
+            ;;
+```
+
+If there is an error, for example if we use an unknown flag like `-x` or we forget to add a required argument `./backup.sh -d`, then `getopts` will set `flags` to `?`, and we can match on that to provide an error message and exit.
+
+```bash
+        ?) # anything else
+            usage  # is an error, so show usage and stop
+            ;;
+```
+
+This might look a bit complicated, but don’t sweat it. It can and will get much, much worse.
+
+Anyway, I hope it makes sort of sense now.
+
+If we make it past the option parsing, we have set variables according to the arguments. We then want to use defaults for those variables we didn’t get arguments, but we already know how to do that:
+
+```bash
+dir=${dir:-$PWD}
+important_file=${important_file:-${dir}/important.txt}
+backup=${backup:-${dir}/backup}
+```
+
+The `${var:-default}` construction comes in handy here.
+
+Now we are ready to run the backup. There are different ways we could deal with working in a directory we get as an argument, but I’ve taken the lazy solution and will just jump to that directory.
+
+```bash
+# Go to the directory we should work in
+cd $dir
+```
+
+Here, something could go wrong. The directory might not exist. If that happens, we should print an error message and `exit`. Here is one way of fixing that:
+
+```bash
+cd $dir 2> /dev/null || echo "Cannot go to $dir" && exit
+```
+
+It is not the prettiest way, but it gives me an excuse to show you a trick that is frequently used in shells. We can use logical operators to control which commands are run. The OR is written as `||` and the AND as `&&`. They work much like logical operators—`a || b` is “true” if either `a` or `b` (or both) are “true” and `a && b` is “true” if both `a` and `b` are—but “true” means has status 0. If `a` is ”true”, we know that `a || b` is “true” regardless of what `b` is, so bash won’t even run `b`. That means that if you have two commands, `a` and `b`, and you want to run `b` only if `a` fails, you can write
+
+```bash
+~> a || b
+```
+
+If `a` has status 0, then all is well, and we don’t run `b`. If `a` has a non-zero status, however, bash needs to run `b` to find out the status of the logical OR, so then `b` is run.
+
+When we write
+
+```bash
+cd $dir 2> /dev/null 
+```
+
+we will go to `$dir` if we can, and then the status is 0 and the rest of the line won’t run. If `cd` fails, it prints an error to `stderr`, but I have redirected that to `/dev/null`, a pseudo-file that you can write to and what you write is lost to the universe forever. I don’t want the error message; I just want to execute the error message and exit.
+
+Here, I use 
+
+```bash
+echo "Cannot go to $dir" && exit
+```
+
+The `echo` command won’t fail, but because I put `&&` after it, the `exit` command will have to run after it. It is not the only way you can run commands sequentially, but by doing it this way, you saw an example of using both `||` and `&&`.
+
+Ok, the rest of the script is mostly the same, but now that we know a new trick, we can improve it so it will create directories if they don’t exist:
+
+```
+# Collect files, zip them up, and save a backup
+[ -d results-$date ] || mkdir results-$date
+cp $( cat $important_file ) results-$date
+tar -czf results-$date.tar.gz results-$date
+rm -r results-$date
+[ -d $backup ] || mkdir $backup
+cp results-$date.tar.gz $backup
+```
+
+In the line `[ -d $results-$date ] || mkdir results-$date` (and similar for `$backup`) we use `[ -d $results-$date ]` to check if that directory exists. This is yet again one of the cases where bash has a weird syntax, but `[ … ]` is used for testing, and is analogue to using the command `test`
+
+```bash
+~> mkdir foo
+~> test -d foo && echo foo exists and is a dir || echo no foo
+foo exists and is a dir
+~> [ -d foo ] && echo foo exists and is a dir || echo no foo
+foo exists and is a dir
+~> rmdir foo
+~> test -d foo && echo foo exists and is a dir || echo no foo
+no foo
+~> [ -d foo ] && echo foo exists and is a dir || echo no foo
+no foo
+```
+
+You typically use `test` or `[ … ]` to test various file properties, and you can check `man test` to get an idea of all the things you can do.
+
+(And did you notice that the commands above used that logical operator trick again? It is neat, don’t you think?)
+
+There is a lot more we could do to handle errors in the script, of course. What happens if one of the important files doesn’t exit? Or the file that should contain the file names is not there? I’m sure you can think of more, but I will leave fixing it as an exercise. You know the tricks you need now.
+
+For completeness, here is the full updated script:
+
+```bash
+#!/bin/bash
+
+# Function for showing usage
+function usage() {
+    echo "Usage: $0
+          -h              display help
+          -d directory    set working directory
+          -i file         file containing files to backup
+          -b directory    where to backup
+    "
+    exit
+}
+
+# Function for showing help (shorter usage)
+help() {
+    echo "Tool for backing up important files.
+
+Will create a tarbal with important files, with a date stamp,
+and copy it to a directory of your choice.
+    
+    -d directory
+    Set in which directory to run
+    
+    -i file
+    Specify in which file we can get the list of what
+    to back up.
+    
+    -b directory
+    Specify in which directory we should place the backup
+    "
+    exit
+}
+
+# Parsing options
+while getopts hd:i:b: flag; do # get one option at a time
+    case $flag in
+        h) # -h flag
+            help  # Display help message and exit
+            ;;
+
+        d) # -d flag
+            dir=$OPTARG
+            ;;
+
+        i) # -i flag
+            important_file=$OPTARG 
+            ;;
+
+        b) # -b flag
+            backup=$OPTARG
+            ;;
+
+        ?) # anything else
+            usage  # is an error, so show usage and stop
+            ;;
+    esac # end of case
+done
+
+# Set variables to default if they are not set by now
+dir=${dir:-$PWD}
+important_file=${important_file:-${dir}/important.txt}
+backup=${backup:-${dir}/backup}
+
+# Now run the backup ######################
+# Get the current date
+date=$( date +%F )
+
+# Go to the directory we should work in
+cd $dir 2> /dev/null || echo "Cannot go to $dir" && exit
+
+# Collect files, zip them up, and save a backup
+[ -d results-$date ] || mkdir results-$date
+cp $( cat $important_file ) results-$date
+tar -czf results-$date.tar.gz results-$date
+rm -r results-$date
+[ -d $backup ] || mkdir $backup
+cp results-$date.tar.gz $backup
+```
+
+
 
 ----
 
