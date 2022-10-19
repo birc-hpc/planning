@@ -540,7 +540,6 @@ If we give the script an option it doesn’t know about, we want this to happen:
 ```bash
 ~> ./backup.sh -x
 ./backup.sh: illegal option -- x
-Unknown option ?
 Usage: ./backup.sh
           -h              display help
           -d directory    set working directory
