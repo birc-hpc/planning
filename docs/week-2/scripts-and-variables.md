@@ -610,11 +610,11 @@ We defined
 
 ```bash
 function usage() {
-	...
+ ...
 }
 
 help() {
-	...
+ ...
 }
 ```
 
@@ -690,10 +690,10 @@ Inside the `while` loop we use a `case` on `$flag`.
 
 ```bash
     case $flag in
-			...
+   ...
     esac # end of case
 ```
-    
+
 This construction will test the value in `$flag` against various options. Each option looks like
 
 ```bash
@@ -738,7 +738,7 @@ If there is an error, for example, if we use an unknown flag like `-x`, or we fo
             ;;
 ```
 
-[^2]: Okay, I am lying here. It is true that `getopts` will set `$flag` to `?` and that we are matching `?`, but there is more to it. If you use `?` as a matching pattern, you will match _any_ single character. So we match `?` but we would also match anything else that isn’t caught by the other cases. If you don’t believe me, move the `?` case up to the top. It will match every time. But we catch the known flags first, so it doesn’t matter if the `?` case matches more than it should. If you want to match _only_ `?` you have to escape it by putting a backslash in front of it: `\?)`. That way, you will match the literal question mark, rather than any single character. If you are wondering if there are other such special match characters,  you should know by now that in bash, [there is always more](https://www.gnu.org/software/bash/manual/html_node/Pattern-Matching.html#Pattern-Matching). The matching you are doing here is the kind of glob-matching you can do on file names with `ls`.
+[^2]: Okay, I am lying here. It is true that `getopts` will set `$flag` to `?` and that we are matching `?`, but there is more to it. If you use `?` as a matching pattern, you will match *any* single character. So we match `?` but we would also match anything else that isn’t caught by the other cases. If you don’t believe me, move the `?` case up to the top. It will match every time. But we catch the known flags first, so it doesn’t matter if the `?` case matches more than it should. If you want to match *only* `?` you have to escape it by putting a backslash in front of it: `\?)`. That way, you will match the literal question mark, rather than any single character. If you are wondering if there are other such special match characters,  you should know by now that in bash, [there is always more](https://www.gnu.org/software/bash/manual/html_node/Pattern-Matching.html#Pattern-Matching). The matching you are doing here is the kind of glob-matching you can do on file names with `ls`.
 
 All this might look a bit complicated, but don’t sweat it. It can and will get much, much worse.
 
@@ -783,7 +783,7 @@ cd $dir 2> /dev/null
 
 we will go to `$dir` if we can, and then the status is 0 and the rest of the line won’t run. If `cd` fails, it prints an error to `stderr`, but I have redirected that to `/dev/null`, a pseudo-file that you can write to and what you write is lost to the universe forever. I don’t want the error message; I just want to execute the error message and exit.
 
-Here, I use 
+Here, I use
 
 ```bash
 echo "Cannot go to $dir" && exit
@@ -906,22 +906,39 @@ rm -r results-$date
 cp results-$date.tar.gz $backup
 ```
 
-
-
 ----
 
-**FIXME:**
-
-----
-
-- <https://www.gnu.org/software/bash/manual/bash.html#Shell-Parameter-Expansion>
-- make `backup` dir if it isn't there
-
-----
-
-- Adding arguments to the script (variables `$@ $1 $2` and such)
-- General variables (just an example where we use a better name)
 - Variables and environment variables--what's the difference (inheriting variables from the parent process)
+
+```bash
+#!/bin/bash
+
+echo "This is foo: '$foo'"
+```
+
+- Mention that `'...'` quotes *inside* `"..."` quotes do not prevent expansion of variables... bash syntax is crazy, but it isn't even the worst offender around.
+
+```bash
+~> ./env.sh
+This is foo: ''
+```
+
+```bash
+~> foo=bar
+~> ./env.sh
+This is foo: ''
+```
+
+```bash
+~> foo=bar ./env.sh
+This is foo: 'bar'
+```
+
+```bash
+~> export foo
+~> ./env.sh
+This is foo: 'bar'
+```
 
 ----
 
@@ -929,7 +946,7 @@ cp results-$date.tar.gz $backup
 
 It actually gets a little more. Every process you run has an "environment" where various variables are specified. You can see which variables your shell knows about using the command `env`. Some variables are passed along to the program, to its environment. The process for how that works is not important for us at this point, except that one of the variables is the working directory (`PWD`), so when you run a program, it knows in which directory it is running, so if any of the arguments are relative paths to files, it knows what they are relative to.
 
-![Process with arguments and environment.](img/process-with-env.png)
+![Process with arguments and environment.](img/processes/process-with-env.png)
 
 While this environment is sometimes important, I don't expect that it will be important in this class, so I will quietly ignore it from here on.
 
