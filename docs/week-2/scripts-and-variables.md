@@ -731,15 +731,17 @@ For the other flags, we set a variable to the flag’s argument. That argument w
             ;;
 ```
 
-If there is an error, for example if we use an unknown flag like `-x` or we forget to add a required argument `./backup.sh -d`, then `getopts` will set `flags` to `?`, and we can match on that to provide an error message and exit.
+If there is an error, for example, if we use an unknown flag like `-x`, or we forget to add a required argument `./backup.sh -d`, then `getopts` will set `flags` to `?`, and we can match on that to provide an error message and exit.[^2]
 
 ```bash
-        ?) # anything else
+        ?) # errors
             usage  # is an error, so show usage and stop
             ;;
 ```
 
-This might look a bit complicated, but don’t sweat it. It can and will get much, much worse.
+[^2]: Okay, I am lying here. It is true that `getopts` will set `$flag` to `?` and that we are matching `?`, but there is more to it. If you use `?` as a matching pattern, you will match _any_ single character. So we match `?` but we would also match anything else that isn’t caught by the other cases. If you don’t believe me, move the `?` case up to the top. It will match every time. But we catch the known flags first, so it doesn’t matter if the `?` case matches more than it should. If you want to match _only_ `?` you have to escape it by putting a backslash in front of it: `\?)`. That way, you will match the literal question mark, rather than any single character. If you are wondering if there are other such special match characters,  you should know by now that in bash, [there is always more](https://www.gnu.org/software/bash/manual/html_node/Pattern-Matching.html#Pattern-Matching). The matching you are doing here is the kind of glob-matching you can do on file names with `ls`.
+
+All this might look a bit complicated, but don’t sweat it. It can and will get much, much worse.
 
 Anyway, I hope it makes sort of sense now.
 
