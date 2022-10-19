@@ -444,6 +444,22 @@ The string `$xbar` refers to the variable `xbar`, which doesn't exist and thus i
 
 If you need a variable inside some text, such that the whole string could be confused for a variable name, then use `${...}`.
 
+If you now get the idea that you can put variables in quoted strings, you are right. With one caveat. If the string is quoted with double-quotes, the variable will be expanded.
+
+```bash
+~> echo "Hello $x"
+Hello foo
+```
+
+In single quotes, however, it won't, and you get the literal string you put in the quotes, reference to the variable and all.
+
+```bash
+~> echo 'Hello $x'
+Hello $x
+```
+
+Bash will generally treat the two kinds of strings differently, something that may surprise you if you are familiar with a language like Python (but if you are familiar with something like Tcl, you will find bash much simpler and more straightforward...just saying).
+
 Another handy expansion looks like this:
 
 ```bash
@@ -459,6 +475,57 @@ The syntax `${var:-default}` will give you the value of `var` if the variable ex
 It is a terrible uninformative syntax, I agree, but most of the rules for expansion are.
 
 It is particularly handy to have defaults for variables if you want your script to take arguments.
+
+But how does arguments work with a shell script? I hear you ask (in my imagination).
+
+Any UNIX process has a list of arguments, from one and up. Not zero, but one, because UNIX considers the name of the program you run the first argument. Arguments are indexed from zero, so the real arguments start at index 1.
+
+![Process with arguments](img/processes/process-with-args.png)
+
+How different languages deal with arguments can vary, but bash was built for UNIX and it has the same philosophy. When you are running a shell script, the variable `$0` will hold the name of the scritp, `$1` is the first argument you gave the script, `$2` is the second, and so on. In addition to this, if you want an expansion of *all* the arguments (excluding the script name) you can use `$@`, and if you want the number of arguments (also excluding the script name) you can use `$#`. Try it with this script (and remember to give it execution permission):[^1]
+
+[^1]: The `\"...\"` might look odd, but this is what it is doing: I wanted to put the list of arguments in quotes. If I just use `"..."` I get a string, containing the list of arguments, and that would expand to just the arguments. I would lose the quotes. But by *escaping* the quotes with backslash I tell bash to use the literal symbol, so it will include the two quotes in the output, instead of trying to be clever about it and interpret it as a string.
+
+```bash
+#!/bin/bash
+
+echo All $# arguments: \"$@\"
+echo The script is named $0
+echo Argument 1: $1
+echo Argument 2: $2
+echo Argument 3: $2
+```
+
+The `$@` and `$#` variables have horribly names. I don't know why shell people insist on using what looks like line noise for variables, but they do. It is what it is, though. At least it is fairly easy to remember the positional arguments.
+
+Let's try to add arguments to our backup script. Maybe we have decided that we want to use it in other projects, so we want to add an option for where the script should run, where the file that contains the list of other files to back up is, and where the backup directory is. We still want to be able to run the script without arguments as before, so we add default arguments to all the options. That could look like this:
+
+```bash
+#!/bin/bash
+
+# Variable $1 is the first argument. If it isn't set,
+# we will use the working directory (which we get from $PWD)
+work_dir=${1:-${PWD}}
+
+# Variable $2 is the second argument. If it isn't set,
+# we use 'important.txt' as default.
+important_file=${2:-important.txt}
+
+# Variable $3 is the tird argument. If it isn't set,
+# we use 'backup' as default.
+backup=${3:-backup}
+
+
+# Get the current date
+date=$( date +%F )
+
+# Collect files, zip them up, and save a backup
+mkdir results-$date
+cp $( cat $important_file ) results-$date
+tar -czf results-$date.tar.gz results-$date
+rm -r results-$date
+mkdir -p $backup && cp results-$date.tar.gz $backup
+```
 
 ----
 
