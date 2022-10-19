@@ -194,6 +194,24 @@ as input.
 
 Notice that the tool also gets the `#!/bin/bash` line (also called the “hash-bang” line since `#` is pronounced “hash” in UNIX and `!` is pronounced “bang”). The shell won’t do anything about that line, though, since `bash` considers anything that follows a `#` a comment that it should ignore. Lucky us. Well, it isn’t *pure* luck, and you will learn that most UNIX tools consider `#` the start of a comment, and they do that because they want to ignore hash-bang lines. But I digress…
 
+If we wanted to run a Python script instead, the hash-bang line might look like this instead:
+
+```python
+#!/usr/bin/python3
+
+print("Hello from Python")
+```
+
+(assuming the `python3` executable is in `/usr/bin`). From `R` we might have
+
+```r
+#!/usr/local/bin/R
+
+print("Hello from R)
+```
+
+(assuming R is in `/usr/local/bin`). It is the same rule everywhere, regardless of which scripting language you are using. Try it out, if you have a program written in another language of this type.
+
 Getting back to our script, which is what such files of commands are called in the UNIX world. If you try to run it as a normal command, you will be disappointed.
 
 ```bash
@@ -374,7 +392,73 @@ This time it is here!
 
 The variables we set in a shell are local to it. If we source, we run the commands in our current shell, so the variables we set will remain set after the script is done. If we run the file as a script, however, it runs in another shell, and what variables are set there will not affect the shell we are interacting with right now.
 
-There is a twist to that, called *environment variables*, but we return to those later. **FIXME: continue**
+There is a twist to that, called *environment variables*, but we return to those later in this note.
+
+## Working with variables and script arguments
+
+Generally, the way you use variables is that yoy can *set* them:
+
+```bash
+~> var=value
+```
+
+Once set, you can get the value they contain:
+
+```bash
+~> echo $var
+```
+
+The variables are textual, and if you are familiar with other programming languages, that can get confusing. Arithmetic expressions and such might not work the way you expect.
+
+```bash
+~> x=2
+~> echo $x + $x
+2 + 2
+```
+
+If you expected two plus two to equal four here, that is the confusion I am talking about. The variable `x` contains the *string* `2`, and when we get its value, we are just getting text.
+
+There are ways to evaluate expressions, but they are a topic for another note. For now, just keep in mind that variables generally contain text, and when you extract values, you are doing text substitution.
+
+There are [a lot of complicated rules](https://www.gnu.org/software/bash/manual/bash.html#Shell-Parameter-Expansion) for modifying how a variable is expanded, but you don't use them often, so don't bother memorising them. If you need something, google it, and work it out from there. If you try to learn the rules now, chances are that you will never ever need it, so that will be a waste of time.
+
+However, one you will definitely run into, looks like this: `${var}`.
+
+Here, the variable is in curly brackets. The various expansion rules will look like that. This one, however, is simple. If you put the variable name in curly backets it expands to the same as if you didn't.
+
+```bash
+~> var=hello
+~> echo $var ${var}
+hello hello
+```
+
+If the curly backets don't do anything, why use them? Well, it is handy if you want to expand a variable inside a text, like this:
+
+```bash
+~> x=foo
+~> echo "First: '$xbar', second '${x}bar'"
+First: '', second 'foobar'
+```
+
+The string `$xbar` refers to the variable `xbar`, which doesn't exist and thus is expanded to an empty string. On the other hand, the string `${x}bar` refers to the variable `x` and then the string `bar`, and when `x` is expanded we get `foobar`.
+
+If you need a variable inside some text, such that the whole string could be confused for a variable name, then use `${...}`.
+
+Another handy expansion looks like this:
+
+```bash
+~> echo ${x:-bar}
+foo
+~> unset x  # remove the variable x
+~> echo ${x:-bar}
+bar
+```
+
+The syntax `${var:-default}` will give you the value of `var` if the variable exists, and otherwise it will give you what comes after `:-`.
+
+It is a terrible uninformative syntax, I agree, but most of the rules for expansion are.
+
+It is particularly handy to have defaults for variables if you want your script to take arguments.
 
 ----
 
@@ -382,6 +466,7 @@ There is a twist to that, called *environment variables*, but we return to those
 
 ----
 
+- <https://www.gnu.org/software/bash/manual/bash.html#Shell-Parameter-Expansion>
 - make `backup` dir if it isn't there
 
 ----
