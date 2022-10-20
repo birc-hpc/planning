@@ -940,13 +940,27 @@ This is foo: 'bar'
 This is foo: 'bar'
 ```
 
+## Environment variables
+
+Arguments are not the only way we can get options into our script. There is a special type of variable we can use, called *environment variables*, and these will automatically be available when the script is running.
+
+They actually go beyond the shell. Every process running on UNIX has, in addition to its arguments, a list of variables, mapping names to strings the way we have seen shell variables do.
+
+![Process with arguments and environment.](img/processes/process-with-env.png)
+
+The environment variables are called that because they are part of the process environment. Ok, I kind of made that up. There is not really anything we would recognise as an “environment.” for a process. But environment variables give a process access to a list of variables that it can use to gain knowledge of the system, where it is running, what it is supposed to do, and such things, so it is *called* the environment, but that is as far as the metaphor can stretch.
+
+It is environment variables that tell a process what the working directory is. The variable is called `PWD`, and as we have seen before, you can see it if you `echo` the variable:
+
+```bash
+~> echo $PWD
+```
+
 ----
 
 **FIXME:** just copied some stuff here that I might need later
 
 It actually gets a little more. Every process you run has an "environment" where various variables are specified. You can see which variables your shell knows about using the command `env`. Some variables are passed along to the program, to its environment. The process for how that works is not important for us at this point, except that one of the variables is the working directory (`PWD`), so when you run a program, it knows in which directory it is running, so if any of the arguments are relative paths to files, it knows what they are relative to.
-
-![Process with arguments and environment.](img/processes/process-with-env.png)
 
 While this environment is sometimes important, I don't expect that it will be important in this class, so I will quietly ignore it from here on.
 

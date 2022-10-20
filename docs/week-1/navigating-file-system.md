@@ -23,12 +23,14 @@ With deeply nested directories, writing such paths becomes tedious, so UNIX also
 /home/mailund
 ```
 
-You can also get the location from the variable `PWD`
+You can also get the location from the variable `PWD`[^pwd]
 
 ```bash
 ~> echo $PWD
 /home/mailund
 ```
+
+[^pwd]: `pwd` stands for “Pathname of the current Working Directory”, not “Print the current Working Directory”. The command `pwd` does print the working directory, but the variable `PWD` (uppercase) doesn't print anything. It is just the name of the current directory.
 
 You can refer to files and folders relative to the working directory by leaving out the `/` at the beginning of a path. The `/` makes the path relative to the root directory, `/`, you could say, and anything that isn't relative to that is relative to your working directory.
 
@@ -115,7 +117,6 @@ You sometimes jump far away with a `cd` command, and then, quite frequently, you
 ```
 
 Here, `cd` has another shortcut. If you do `cd -` you will jump back to where you were before the most recent `cd`:
-
 
 ```bash
 ~> pwd
