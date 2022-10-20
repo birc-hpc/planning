@@ -818,7 +818,7 @@ no foo
 no foo
 ```
 
-You typically use `test` or `[ … ]` to test various file properties, and you can check `man test` to get an idea of all the things you can do.
+You typically use `test` or `[ … ]` to test various file properties, and you can check `man test` to get an idea of everything you can do. For example, if you want to know if a file exists rather than a directory, you would use `[ -f filename ]`, or if you want to know if you can execute the file, you will use `[ -x filename ]`. There are a ton of options, but they are impossible to remember, so use `man test` when you need to check something.
 
 (And did you notice that the commands above used that logical operator trick again? It is neat, don’t you think?)
 
@@ -956,12 +956,196 @@ It is environment variables that tell a process what the working directory is. T
 ~> echo $PWD
 ```
 
-----
+It is through this variable your shell, and all other variables, know which directory you consider the current one.
 
-**FIXME:** just copied some stuff here that I might need later
+I don't know if you noticed, but in our backup script, we just assumed that the script would know what the working directory was when we ran it despite the script running in a completely new shell that shouldn't be influenced by the state of our current shell. We generally expect that what happens in the new shell and what happens in the current one are independent events that won’t influence each other, but yet, the new shell knew where we were in our current shell. Either implicitly, when we didn’t take a directory as an argument, or explicitly when we made the default directory `$PWD`.
 
-It actually gets a little more. Every process you run has an "environment" where various variables are specified. You can see which variables your shell knows about using the command `env`. Some variables are passed along to the program, to its environment. The process for how that works is not important for us at this point, except that one of the variables is the working directory (`PWD`), so when you run a program, it knows in which directory it is running, so if any of the arguments are relative paths to files, it knows what they are relative to.
+How did that work? And how did the new shell know how to use the working directory of the shell that calls it rather than some other shell we might have running?
 
-While this environment is sometimes important, I don't expect that it will be important in this class, so I will quietly ignore it from here on.
+That is the magic of environment variables, and the rules are surprisingly simple for a UNIX system. If one process starts another process, the child process inherits all the environment variables from the parent. So, when we sit in our current shell, with a working directory in `PWD`, and we start a new shell by running a script, we create a child process and the child will inherit `PWD`.
 
-- **FIXME** Explain that the environment variable `$PWD` is the reason `bash backup.sh` didn't run in the root.
+Once the child is running, we can change the variable in the parent, in the child, or in both, and they do not affect each other (so we can `cd` in our script without moving in our current shell). But upon creation, the environment the parent process has is cloned into the child.
+
+If you are curious about which environment variables your shell has, you can use the `env` command. It will list them all. Most of them won’t mean a thing to you, but you should see `PWD` as we’ve just discussed. You will also find `PATH` there, which tells you that child processes will be able to see where they should search for executables. There is also a `HOME` variable, which is your home directory. And likely many, many more, since it is the general way UNIX uses for different tools to share certain kinds of information.
+
+The list you get is not every variable you have in your shell. If you don’t believe me, try setting a variable
+
+```bash
+~> foo=bar
+```
+
+and then type `env`. It won’t be there (or shouldn’t be, unless someone is playing tricks with you). This is because the variables we set in the shell are not automatically environment variables. They are local to the current shell, and they will not be inherited by children.
+
+Try writing this script and call it `env.sh`:
+
+```bash
+#!/bin/bash
+
+echo "This is foo: '$foo'"
+```
+
+Call it, and you should get:[^squote]
+
+```bash
+~> ./env.sh
+This is foo: ''
+```
+
+[^squote]: I told you earlier that variables are not expanded in single quotes, `’…’`. Well, I was lying. They are if the single quotes are inside double quotes. It’s a mess.
+
+It says that `$foo` evaluates to nothing, and that is despite you just setting it to `bar` a few lines above. (If you didn’t do that, try it now).
+
+When we set `foo`, it isn’t an environment variable, it doesn’t show up in `env`, and the child process running the script won’t know about it.
+
+There are two ways to get `foo` into the script as an environment, one where we explicitly set it for the child, the syntax looks like this:
+
+```bash
+~> foo=bar ./env.sh
+This is foo: 'bar'
+```
+
+If we wanted to set more than one variable, we space separate the assignments, e.g.:
+
+```bash
+~> foo=bar bar=baz ./env.sh
+```
+
+If we didn’t have `foo` in our current shell, it wouldn’t get inserted there; it only goes into the child.
+
+```bash
+~> unset foo
+~> foo=bar ./env.sh
+This is foo: 'bar'
+~> echo $foo
+
+```
+
+Inside the child, `foo` is part of the environment variables, as you can check if you add the `env` command to the script.
+
+The other way to get it into the child as an environment variable is to set it as an environment variable in the current shell. To do that, we *export* the variable. I don’t know who chose that name, it isn’t precisely exporting *anything*; it just makes it an environment variable so children will inherit it.
+
+```bash
+~> export foo
+~> ./env
+This is foo: 'bar'
+```
+
+This time, `foo` is added to the environment variables in this shell as well, as you can test with `env`. That means that *all* future children will see it as well.
+
+If you want to define a variable and export it at the same time, you combine the syntax for both:
+
+```bash
+~> export foo=bar
+```
+
+Environment variables are great because you can set up your shell with variables controlling most of how other tools behave. We’ve already seen how `PWD` can tell child processes about the working directory or `HOME` for the home directory, but there are many other cases where environment variables are used. For Python users, `PYTHONPATH` can be used to specify where modules should be found. The variable `TERM` (which you probably will never need to touch) tells programs what kind of terminal you are using (which generally means which program you are using to communicate with your shell), and that can inform them about how fancy they can make the output with colours and such. Generally, environment variables are used in many places to inform processes about a range of things, and chances are you will use tools that rely on them for customisation.
+
+Let’s try to use them in our backup script. We will keep our arguments, so we can specify directories and files when we run the script, but instead of hard-wiring the defaults, we will try to get them from environment variables.
+
+What we have right now is this:
+
+```bash
+dir=${dir:-$PWD}
+important_file=${important_file:-${dir}/important.txt}
+backup=${backup:-${dir}/backup}
+```
+
+Here, we set the variables based on the script arguments, bur for default values, we have hardwired `$PWD` for the working directory, `${dir}/important.txt` for the file that contains the backup list, and `${dir}/backup` for the backup directory.
+
+We probably still want defaults if neither the environment variables nor script arguments set them, but we will pick the environment variables if set and let the script arguments overrule them.
+
+Replace the lines from above with these:
+
+```bash
+# Pick, in priority, arg, then env, then default
+# Environment variables are:
+# - PROJECT_DIR -- the project directory where the data is
+# - BACKUP_FILE -- where we get the list of files to backup
+# - BACKUP_DIR  -- where we should copy the backups
+dir=${dir:-${PROJECT_DIR:-$PWD}}
+important_file=${important_file:-${BACKUP_FILE:-important.txt}}
+backup_env=${backup:-${BACKUP_DIR:-backup}}
+```
+
+We use two levels of the `${var:-default}` syntax. The outer level asks if we got the variable from the arguments, and if we did, we keep it. Otherwise, we need the default, and the default is another selection where we will pick the environment variable if we have it and otherwise default to the hardwired values.
+
+It isn’t pretty, but I know you can work it out if you stare at it for a few minutes.
+
+How would we use it, though? If we provide the values when we call the script, we haven’t improved upon the version that took arguments.
+
+```bash
+~> BACKUP_DIR=~/my-backups ./backup.sh -i important.txt
+```
+
+It might be a more readable command since we can use longer names for the options, but it is also more typing and no less error-prone than what we had.
+
+Of course, this is not the typical way to use environment variables. The idea with them is that we set them once and then can rely on them every time we call the program later on.
+
+If I am working on my `apes` project, I could set the variables like this:
+
+```bash
+~> export PROJECT_DIR=/home/mailund/projects/apes
+~> export BACKUP_FILE=/home/mailund/projects/apes/important.txt
+~> export BACKUP_DIR=/home/mailund/my-backups
+```
+
+Then, every time I run `backup.sh`, it will do the backup in the `apes` project directory and put the backups in `/home/mailund/my-backups`.
+
+**FIXME: updating .bashrc to make this permanent if they want to**
+
+That will work great until I start working on another project. If I do and run `backup.sh`, it will run in the wrong directory and with the wrong files. Sometimes, life sucks.
+
+## Using configuration files
+
+We now could get the idea that if the backups depend on the project that we are working on, then what about putting a file in our project directories that the backup script could use?
+
+Great idea. I’m not being sarcastic; it is a good idea. And I’m talking to myself, so why would I be sarcastic?
+
+Let’s try putting the variables in a file, we could call it `conf.sh`:
+
+```bash
+important_file=/home/mailund/projects/apes/important.txt
+backup=/home/mailund/my-backups
+```
+
+I didn’t add the working directory because that will be the one I am working in, which is already `$PWD`. There will be no need for environment variables now. If we make the variables in `conf.sh` environment variables, we won’t inherit them if we run it as a script anyway; we only go parent to child and not the other direction. We will simply source `conf.sh`, so the variables we define there will become variables in the script, and that is how we will use it.
+
+Then, in my `backup.sh`, I will require that the `conf.sh` file exists, run it if it does, and I will get rid of the arguments since I don’t need those any longer if I can always get them from the configuration file.
+
+```bash
+#!/bin/bash
+
+function read_conf() {
+    # Function will source conf.sh if
+    # it exists. Its return status
+    # depend on whether we succeeded
+    [ -f conf.sh ] && source conf.sh
+}
+
+function report_conf_error() {
+    echo "Couldn't open conf.sh!"
+    exit 1  # Exiting 1 means we are not claiming success
+}
+
+# Get the environmment from conf.sh
+read_conf || report_conf_error
+
+# Now run the backup ######################
+date=$( date +%F )
+[ -d results-$date ] || mkdir results-$date
+cp $( cat $important_file ) results-$date
+tar -czf results-$date.tar.gz results-$date
+rm -r results-$date
+[ -d $backup ] || mkdir $backup
+cp results-$date.tar.gz $backup
+```
+
+I used functions for handling the configuration reading. Not because we have to, but because it makes the code `read_conf || report_conf_error` slightly more readable compared to using the logical operators in one long line. Next session, we learn an even better way, but functions serve us fine just now.
+
+Also notice that the error handling uses `exit 1`. When we exit from a script, we can add an exit code to the `exit` call. That will become the status from the script to the caller. I don’t want the caller to think that all went well, which is what we would indicate with the default exit status of zero, so I made the script exit one.
+
+Otherwise, there is nothing more to the script. We get the variables from `conf.sh`, so option parsing or environment variables are no longer needed. Whenever you run the script, you should be in a directory that has a `conf.sh`, and if you do, then the configuration is taken care of.
+
+Using a script we blindly source is an easy way to set up configurations. It is *incredibly* unsafe, so never let anyone else near something like `conf.sh`. If you do, they can make you run any code whatsoever. If you are the only one who can edit the configuration script, you are relatively safe; it isn’t worse than putting the code in the `backup.sh` script in the first place; you just have something you can easily reuse in many directories. It isn’t a bad idea, as long as you keep the configuration file safe, but we will see a safer (but far less flexible) approach in the next session.
+
+For now, marvel at how much you can now do to add your own commands to your UNIX tool kit. Anything you can do with the commands you know (or learn in the future), you can combine into a single shell script, and thus a single command, for future use. You can add your own options to the command (although in a simple form right now, but with time you can learn more advanced option parsing). You can use environment variables to set up global configuration information that your scripts can use, and you even have a nifty way to make configuration files. Not bad for a day’s work, eh?
