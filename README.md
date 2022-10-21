@@ -12,7 +12,7 @@ Tentative schedule:
   - [ ] Getting files and software (conda, scp, rsync, wget, git)
   - [ ] Editing files, mount, VSCode
   - [x] [Pipelines (stdin/stdout/pipelines)](docs/week-2/pipelines.md)
-  - [ ] [Scripts and variables.](docs/week-2/scripts-and-variables.md)
+  - [x] [Scripts and variables.](docs/week-2/scripts-and-variables.md)
 
 - **Week 03**
   - [ ] [BASH programming](docs/week-3/programming.md)
