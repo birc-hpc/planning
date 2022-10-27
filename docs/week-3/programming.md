@@ -140,6 +140,74 @@ Read `man test` for the whole story.
 
 ### Using `let`
 
+The `let` command is not directly a command for testing, but it gives you arithmetic operations and is frequently used for testing because of that.
+
+With `let`, you can execute one or more expressions:
+
+```bash
+~> let expr1 [expr2 expr3 ...]
+```
+
+For example, the following evaluates three expressions, two assignments and a multiplication:
+
+```bash
+~> let a=2 b=4 a*b
+```
+
+The command sets the variable `a` to 2, then the variable `b` to 4, and finally multiplies the two.
+
+It doesn’t write the result anywhere (and it doesn’t put it in `$?` either; that is reserved for reporting success or failure), so it is not immediately obvious that the command computed anything. If you want the result, however, you can put it in a variable; the variables that `let` sets will be available as shell variables as well:
+
+```bash
+~>let a=2 b=4 res=a*b ; echo "$a * $b = $res"
+2 * 4 = 8
+```
+
+Left of the `;`, we run the `let` command, and there variables are not prefixed by `$`, but on the right, we run the shell command `echo`, and here we need `$` to get the value of a variable.
+
+In the `echo` command, I put the output in a string. If I didn’t, the `*` would expand to the files in the current directory, and the output would get weird. Try it, if you don’t believe me. On the left, in the `let` command, I didn’t use quotes, but I only got away with that because I didn’t have any spaces around `*` or any of the assignments. If you put spaces in one of the `let` command’s arguments, it will consider it multiple expressions, and that will not work. This is one argument to `let`:
+
+```bash
+~> let a=2
+```
+
+However, this is three arguments
+
+```bash
+~> let a = 2
+```
+
+If you want spaces, use quotes:
+
+```bash
+~> let "a = 2" "b = 4" "res = a * b" ; echo "$a * $b = $res"
+2 * 4 = 8
+```
+
+Where testing comes in with `let` is when the last expression is a numerical comparison. If, for example, we want to check if `a` times `b` equals some other variable `foo`, we can do:
+
+```bash
+~> foo=8 let "a = 2" "b = 4" "a * b == foo" ; echo $?
+0
+~> foo=16 let "a = 2" "b = 4" "a * b == foo" ; echo $?
+1
+```
+
+Let’s unpack this because a lot is going on here. The first assignment, `foo=8` or `foo=16`, is just a variable assignment in the shell, as we know and love them. Then we run the `let` command that computes `a * b` and compares with `foo`. Although `foo` is a variable in the shell and not one we set in `let`, it knows about it. It knows all your shell variables as needed. Because the last expression is a comparison, `let`’s return status will be zero if the comparison was true and one if it was not.
+
+Here’s another example. Say we want to know if a file is big or small (where we define “big” as any file with more than 100 lines). We can get the number of lines in a file using the `wc` command, so something like `filesize=$( wc -l $filename )` will put the size in the variable `filesize`. Once it is there, we can use `let` to check if it is bigger or smaller than 100:
+
+```bash
+filesize=$( wc -l < $filename )
+let "filesize > 100" && echo "$filename is big" || echo "$filename is small"
+```
+
+We used an ugly logical expression here again, but soon we will move on from that and write some more readable commands. I promise.
+
+If you want to work with numerical variables, the `let` command has most of the functionality you will need. If you then want to compare numbers to control the flow of a script, you can use the status from `let` if the final expression is a comparison.
+
+The operators you have available in `let` are these:
+
 | Operator | Meaning |
 |:--|:--|
 | `var++` | Post-increment: returns the current value of `var` and then add one to `var`. |
