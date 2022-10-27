@@ -155,7 +155,7 @@ Read `man test` for the whole story.
 | `<<` and `>>` | Bitwise shift (left and right). |
 | `<`, `<=`, `>`, `>=` | Numerical comparisons. |
 | `==` and `!=` | Comparison (equal and unequal). |
-| `&`, `|`, and `^` | Bitwise AND, OR, and XOR. |
+| `&`, `\|`, and `^` | Bitwise AND, OR, and XOR. |
 | `&&` and `||` | Logical AND and OR. |
 | `expr1 ? expr2 : expr3` | Conditional operator: If `expr1` is true, return `expr2`. If `expr1` is false, return `expr3`. |
 | `var = expr` | Assignment. Set `var` to the value of `expr`. |
