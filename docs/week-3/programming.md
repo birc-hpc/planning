@@ -97,11 +97,53 @@ This, alone, is, of course, useless. We can immediately see if the strings are t
 1
 ```
 
+The `test` operators you are most likely to find a use for are these:
+
+| Expression | Meaning |
+|:--|:--|
+| -d file | True if file exists and is a directory. |
+| -e file | True if file exists (regardless of type). |
+| -f file | True if file exists and is a regular file. |
+| -k file | True if file exists and its sticky bit is set. |
+| -p file | True if file is a named pipe (FIFO). |
+| -r file | True if file exists and is readable. |
+| -s file | True if file exists and has a size greater than zero. |
+| -w file | True if file exists and is writable. |
+| -x file | True if file exists and is executable. |
+| -n string | True if the length of string is nonzero. |
+| -z string | True if the length of string is zero. |
+| file1 -nt file2 | True if file1 exists and is newer than file2. |
+| file1 -ot file2 | True if file1 exists and is older than file2. |
+| file1 -ef file2 | True if file1 and file2 exist and refer to the same file. |
+| string | True if string is not the null string. |
+| s1 = s2 | True if the strings s1 and s2 are identical. |
+| s1 != s2 | True if the strings s1 and s2 are not identical. |
+| s1 < s2 | True if string s1 comes before s2 based on the binary value of their characters. |
+| s1 > s2 | True if string s1 comes after s2 based on the binary value of their characters. |
+| n1 -eq n2 | True if the integers n1 and n2 are algebraically equal. |
+| n1 -ne n2 | True if the integers n1 and n2 are not algebraically equal. |
+| n1 -gt n2 | True if the integer n1 is algebraically greater than the integer n2. |
+| n1 -ge n2 | True if the integer n1 is algebraically greater than or equal to the integer n2. |
+| n1 -lt n2 | True if the integer n1 is algebraically less than the integer n2. |
+| n1 -le n2 | True if the integer n1 is algebraically less than or equal to the integer n2. |
+
+In addition, you have available logical operations:
+
+| Expression | Meaning |
+|:--|:--|
+| ( expr ) | Same logical value as `expr`. You can just set parentheses to group an expression. |
+| ! expr | Logical NOT. Is false if `expr` is true and vice versa. |
+| expr1 -a expr2 | Logical AND. Is true if and only if both of `expr1` and `expr2` are true. |
+| expr1 -o expr2 | Logical OR. Is true if at least one of `expr1` or `expr2` are true. |
+
 Read `man test` for the whole story.
 
 ### Using `let`
 
-
+|  |  |
+|:--|:--|
+|  |  |
+|  |  |
 
 ## Parentheses preposterousness
 
