@@ -360,22 +360,59 @@ Or, of course, you could use the `let` or `(( ... ))` syntax.
 0
 ```
 
-A powerful feature of the `[[ ... ]]` test, that isn’t supported by `[ ... ]` is pattern matching. If you have a string `x` you can test if it matches a regular expression `pat` with `[[ x =~ pat ]]`. [Regular expressions](https://en.wikipedia.org/wiki/Regular_expression) is far to broad a topic to cover in this lesson, but it is a way of describing classes of strings, not unlike how shell wildcards can be used to match file names that follow a given pattern.
+A powerful feature of the `[[ ... ]]` syntax that isn’t supported by `[ ... ]` is textual *pattern matching*. There are two different kinds of these: the glob/wildcard patterns you know from files and the shell and then regular expressions. [Regular expressions](https://en.wikipedia.org/wiki/Regular_expression) is far too broad a topic to cover in this lesson, but it is a way of describing classes of strings, not unlike how shell wildcards can be used to match file names that follow a given pattern, but regular expressions are more powerful.
+
+If you compare strings using `[[ x = pat ]]` or `[[ x == pat ]]`, then the command will check if the string `x` matches the (glob) pattern `pat`.
+
+```bash
+~> f=foo.txt
+~> [[ $f == *.txt ]]; echo $?
+0
+```
+
+This is true because `foo.txt` matches the pattern `*.txt`. If we use the `test` command, this won’t work either:
+
+```bash
+~> [ $f = *.txt ]; echo $?
+1
+```
+
+That command tests whether `$f` is equal to the string `*.txt`, not whether it matches the pattern `*.txt`.
+
+The `==` test, unlike normal equality, is not symmetric:
+
+```bash
+~> [[ $f == *.txt ]]; echo $?
+0
+~> [[ *.txt == $f ]]; echo $?
+1
+```
+
+The pattern `foo.txt` matches itself, but it doesn’t match the string `*.txt`.
+
+We could use something like that to determine the file type based on the file name’s suffix:
+
+```bash
+[[ $filename = *.txt ]] && echo $filename "is a .txt file"
+[[ $filename = *.md ]]  && echo $filename "is an .md file"
+```
+
+When you test using `=` or `==`, you always use glob patterns, but if you instead use `=~` — `[[ x =~ pat ]]` — then `pat` is interpreted as a regular expression instead of a glob.
 
 With regular expressions, `.` matches any single character. The symbol `*` means “match what was in front of it any number of times, from zero and up”. Thus, `.*` would match any number of characters, while `a*` would match any sequence of `a`. If you want an actual dot, you can escape it: `\.`. Then `\.*` would mean a sequence of dots, rather than a sequence of any symbols at all. The string `.txt` would match any four-letter string that ends with `txt` while `\.txt` will match only the string `".txt"` (a dot and then `t`, `x`, and `t`).
 
-The expression `[[ x =~ pat ]]` will evaluate to true if the pattern `pat` can be found anywhere in `x`. So, if we used something like `[[ $filename =~ \.txt ]]` we would be testing if `.txt` is found anywhere in the `$filename` string. If we were doing something like that, chances are that we wanted to know if the suffix of `$filename` was `.txt` (i.e., if it was a text file), so matching anywhere in the string is not quite good enough. No worries, though, we can also fix that with regular expressions.
+The expression `[[ x =~ pat ]]` will evaluate to true if the pattern `pat` can be found anywhere in `x`. So, if we used something like `[[ $filename =~ \.txt ]]` we would be testing if `.txt` is found anywhere in the `$filename` string. If we were doing something like that, chances are that we wanted to know if the suffix of `$filename` was `.txt` (i.e., if it was a text file), so matching anywhere in the string is not quite good enough. No worries, though; we can also fix that with regular expressions.
 
 The symbol `$` matches the end of a string, and if you put that at the end of the pattern, the pattern has to match the end of a string and can’t just match anywhere.
 
-We could use something like that to determine the file type based on the file name’s suffix:
+The file type matching, using regular expressions rather than globs, could then look like this:
 
 ```bash
 [[ $filename =~ \.txt$ ]] && echo $filename "is a .txt file"
 [[ $filename =~ \.md$ ]]  && echo $filename "is an .md file"
 ```
 
-Regular expressions are an extremely powerful tool found throughout the UNIX command line ecosphere. They can, however, be difficult to use, and it requires some practice to be proficient in writing them, so we have to leave them here for now.
+This is more complicated than the glob patterns (which is why we still use those), but regular expressions are an extremely powerful tool found throughout the UNIX command line ecosphere. They can, however, be difficult to use, and it requires some practice to be proficient in writing them, so we have to leave them here for now.
 
 If you are in doubt, use the `[[ ... ]]` construction. It will almost always behave the same as `[ ... ]` (with the caveats on expansion), but it can do more.
 
@@ -392,6 +429,50 @@ Double parentheses have the same meaning as using `let`, with a few modification
 
 
 ## If-statements
+
+```bash
+#!/bin/bash
+
+function error() {
+    echo "ERROR: $1"
+    exit 1
+}
+
+if [ -f conf.sh ]
+then
+    echo "Reading configuration file."
+    source conf.sh || error "Problems reading conf.sh"
+    echo "Done reading configuration."
+fi
+
+...
+```
+
+```bash
+#!/bin/bash
+
+function error() {
+    echo "ERROR: $1"
+    exit 1
+}
+
+if [ ! -f conf.sh ]; then
+    echo "Creating a default conf.sh file"
+    cat > conf.sh <<EOF
+important_file=important.txt
+backup=backups
+EOF
+fi
+
+echo "Reading configuration file."
+source conf.sh || error "Problems reading conf.sh"
+echo "Done reading configuration."
+
+...
+```
+
+**FIXME:** `else` example
+**FIXME:** `elif` example
 
 ## Cases
 
