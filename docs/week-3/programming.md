@@ -6,6 +6,8 @@ We are going aiming to become expert shell programmers, and we are certainly not
 
 ## Testing stuff
 
+
+
 ### Running a command
 
 ```bash
@@ -104,9 +106,16 @@ Again, it is not that it is impossible to use shell operators as operators for a
 0
 ```
 
-When you compare numbers with either `[[ ... ]]` or `[ ... ]`, you have to be careful, though. Comparisons are textual, not arithmetical. `[[ 10 > 9 ]]` is false because the _string_ “10” is sorted before the _string_ 9. With `(( 10 > 9 ))`, the comparison is arithmetical, and the _number_ 10 is greater than the _number_ 9.
+When you compare numbers with either `[[ ... ]]` or `[ ... ]`, you have to be careful, though. Comparisons are textual, not arithmetical. `[[ 10 > 9 ]]` is false because the _string_ “10” is sorted before the _string_ 9.
 
-The two commands can compare numbers, but you need different operators. The *numerical* greater than is `-gt`, so you would write
+```bash
+~> [[ 10 > 9 ]]; echo $?
+1
+```
+
+With the `let` command, `(( 10 > 9 ))`, the comparison is arithmetical, and the _number_ 10 is greater than the _number_ 9.
+
+The two test commands can compare numbers, but you need different operators. The *numerical* greater than is `-gt`, so you would write
 
 ```bash
 ~> [[ 10 -gt 9 ]]; echo $?
