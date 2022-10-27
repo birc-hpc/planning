@@ -159,7 +159,7 @@ Read `man test` for the whole story.
 | `&&` and `\|\|` | Logical AND and OR. |
 | `expr1 ? expr2 : expr3` | Conditional operator: If `expr1` is true, return `expr2`. If `expr1` is false, return `expr3`. |
 | `var = expr` | Assignment. Set `var` to the value of `expr`. |
-| `*=`, `/=`, `%=`, `+=`, `-=`, `<<=`, `>>=`, `&=`, `^=`, `|=` | Assignment operators. The expression `a op= b` has the effect of `a = a op b`. |
+| `*=`, `/=`, `%=`, `+=`, `-=`, `<<=`, `>>=`, `&=`, `^=`, `\|=` | Assignment operators. The expression `a op= b` has the effect of `a = a op b`. |
 
 ## Parentheses preposterousness
 
