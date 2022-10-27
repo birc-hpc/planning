@@ -59,13 +59,55 @@ Here, `true` and `false` are not boolean values, but commands you can execute. T
 
 ### Using `test`
 
+The tests we have used so far, i.e. `[ -d … ]` and `[ -f … ]` are calling the command `test`. The square bracket syntax is just an alternative to calling this command, so 
+
+```bash
+~> [ -f conf.sh ] ; echo $?
+0
+```
+
+and
+
+```bash
+~> test -f conf.sh ; echo $?
+0
+```
+
+are doing the exact same thing.
+
+The `test` command is the go-to command for testing file and directory properties. We have used it to test if a file exists, option `-f`, or whether a file exists and is a directory, option `-d`, and these are the most common file tests. However, if you need to test for other file properties, e.g. whether the file exists and is executable (`-x`) or whether you can write to it (`-w`), then check `man test`.
+
+The `test` command also provides several string tests. You can, for example, test if two strings are the same:
+
+```bash
+~> [ "foo" = "bar" ]; echo $?
+1
+~> [ "foo" = "foo" ]; echo $?
+0
+```
+
+This, alone, is, of course, useless. We can immediately see if the strings are the same. But combined with variables, it gives us a way to check if a variable has a specific value.
+
+```bash
+~> foo="foo"
+~> [ $foo = "foo" ]; echo $?
+0
+~> foo="bar"
+~> [ $foo = "foo" ]; echo $?
+1
+```
+
+Read `man test` for the whole story.
+
 ### Using `let`
+
+
 
 ## Parentheses preposterousness
 
-This section will be a bit messy. I appologise for that. Well, not appologise, because I didn't do any of the damage, but I am sorry that it is this way. The bash shell uses different kinds of parantheses for different purposes, and you always need to pick the right one for the job when you program in bash. There isn't much system to it, if any, so you just have to memorise which kinds of parantheses are needed for which kind of jobs.
+This section will be a bit messy. I apologise for that. Well, I do not apologise because I didn't do any of the damage, but I am sorry that it is this way. The bash shell uses different kinds of parentheses for different purposes, and you always need to pick the right one for the job when you program in bash. There isn't much system to it, so you have to memorise which kinds of parentheses are needed for which kind of jobs.
 
-Single parentheses runs commands in a sub-shell. That is the same as running the commands in a shell script, in the sense that any changes you make to the shell's status and environment only affect the new shell and not the current one. For example, if you set variables, the variables affect the new shell and not the old one:
+Single parentheses run commands in a sub-shell. That is the same as running the commands in a shell script, in the sense that any changes you make to the shell's status and environment only affect the new shell and not the current one. For example, if you set variables, the variables affect the new shell and not the old one:
 
 ```bash
 ~> x=foo
@@ -93,7 +135,7 @@ Adding `$` to the sub-shell command, you get the output back in a form you can u
 bar
 ```
 
-Single parantheses can be used as test conditions, because they are commands like any other command.
+Single parentheses can be used as test conditions because they are commands like any other command.
 
 ```bash
 ~> (echo "foo" ; true) ; echo $?
@@ -104,7 +146,7 @@ foo
 1
 ```
 
-Other than that, they are not directly related to testing, unlike the other parantheses variants we will examine below.
+Other than that, they are not directly related to testing, unlike the other parentheses variants, we will examine below.
 
 ### Using `let` as `(( ... ))`
 
