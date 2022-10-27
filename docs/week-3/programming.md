@@ -272,9 +272,7 @@ foo
 1
 ```
 
-Other than that, they are not directly related to testing, unlike the other parentheses variants, we will examine below.
-
-### Using `let` as `(( ... ))`
+Other than that, they are not directly related to testing, unlike the other parentheses variants that we will examine below.
 
 ### Using `test` as `[ ... ]` or `[[ ... ]]`
 
@@ -362,9 +360,36 @@ Or, of course, you could use the `let` or `(( ... ))` syntax.
 0
 ```
 
-**FIXME: regex matching**
+A powerful feature of the `[[ ... ]]` test, that isn’t supported by `[ ... ]` is pattern matching. If you have a string `x` you can test if it matches a regular expression `pat` with `[[ x =~ pat ]]`. [Regular expressions](https://en.wikipedia.org/wiki/Regular_expression) is far to broad a topic to cover in this lesson, but it is a way of describing classes of strings, not unlike how shell wildcards can be used to match file names that follow a given pattern.
+
+With regular expressions, `.` matches any single character. The symbol `*` means “match what was in front of it any number of times, from zero and up”. Thus, `.*` would match any number of characters, while `a*` would match any sequence of `a`. If you want an actual dot, you can escape it: `\.`. Then `\.*` would mean a sequence of dots, rather than a sequence of any symbols at all. The string `.txt` would match any four-letter string that ends with `txt` while `\.txt` will match only the string `".txt"` (a dot and then `t`, `x`, and `t`).
+
+The expression `[[ x =~ pat ]]` will evaluate to true if the pattern `pat` can be found anywhere in `x`. So, if we used something like `[[ $filename =~ \.txt ]]` we would be testing if `.txt` is found anywhere in the `$filename` string. If we were doing something like that, chances are that we wanted to know if the suffix of `$filename` was `.txt` (i.e., if it was a text file), so matching anywhere in the string is not quite good enough. No worries, though, we can also fix that with regular expressions.
+
+The symbol `$` matches the end of a string, and if you put that at the end of the pattern, the pattern has to match the end of a string and can’t just match anywhere.
+
+We could use something like that to determine the file type based on the file name’s suffix:
+
+```bash
+[[ $filename =~ \.txt$ ]] && echo $filename "is a .txt file"
+[[ $filename =~ \.md$ ]]  && echo $filename "is an .md file"
+```
+
+Regular expressions are an extremely powerful tool found throughout the UNIX command line ecosphere. They can, however, be difficult to use, and it requires some practice to be proficient in writing them, so we have to leave them here for now.
 
 If you are in doubt, use the `[[ ... ]]` construction. It will almost always behave the same as `[ ... ]` (with the caveats on expansion), but it can do more.
+
+### Using `let` as `(( ... ))`
+
+Double parentheses have the same meaning as using `let`, with a few modifications. You don’t need to put expressions in quotes as aggressively. The `(( ... ))` is not a simple shell command, so it is better at figuring out that what you give it is an expression and not a sequence of otherwise unrelated command arguments. Because it allows spaces in the expressions without quotes, you can’t use spaces to separate expressions if you give `(( ... ))` more than one, so in that case, you need to use commas instead. The operations you have in `(( ... ))` and the operations you have with `let` are the same, however.
+
+```bash
+~> let a=2 b=4 res=a*b ; echo "$a * $b = $res"
+2 * 4 = 8
+~> (( a = 2, b = 4, res = a * b )); echo "$a * $b = $res"
+2 * 4 = 8
+```
+
 
 ## If-statements
 
@@ -372,7 +397,31 @@ If you are in doubt, use the `[[ ... ]]` construction. It will almost always beh
 
 ## While loops
 
+```bash
+cat file.txt | while read line; do
+  echo $line
+done
+```
+
 ## For loops
+
+```bash
+for i in {1..5}; do
+    echo $i
+done
+```
+
+```bash
+for i in {5..50..5}; do
+    echo $i
+done
+```
+
+```bash
+for i in /etc/rc.*; do
+  echo $i
+done
+```
 
 ```bash
 for (( i=0; i < 10; i++ )); do

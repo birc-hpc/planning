@@ -19,6 +19,7 @@ Tentative schedule:
 
 - **Week 04**
   - [ ] [*Reproducible research?*](docs/week-4/reproducible-research.md)
+  - [ ] Regular expressions + `sed` and `awk`?
 
 - **Week 05**
   - [ ] [Queue system (submit, status, log, ...)](docs/week-5/the-queue-system.md)
