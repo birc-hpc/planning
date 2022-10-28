@@ -360,7 +360,7 @@ Or, of course, you could use the `let` or `(( ... ))` syntax.
 0
 ```
 
-A powerful feature of the `[[ ... ]]` syntax that isn’t supported by `[ ... ]` is textual *pattern matching*. There are two different kinds of these: the glob/wildcard patterns you know from files and the shell and then regular expressions. [Regular expressions](https://en.wikipedia.org/wiki/Regular_expression) is far too broad a topic to cover in this lesson, but it is a way of describing classes of strings, not unlike how shell wildcards can be used to match file names that follow a given pattern, but regular expressions are more powerful.
+A powerful feature of the `[[ ... ]]` syntax that isn’t supported by `[ ... ]` is textual *pattern matching*. There are two different kinds of these: the glob/wildcard patterns you know from files and the shell and then regular expressions. [Regular expressions](https://en.wikipedia.org/wiki/Regular_expression) is far too broad a topic to cover in this lesson, but it is a way of describing classes of strings, not unlike how shell wildcards can be used to match file names that follow a given pattern. Regular expressions are more powerful but also harder to learn to master.
 
 If you compare strings using `[[ x = pat ]]` or `[[ x == pat ]]`, then the command will check if the string `x` matches the (glob) pattern `pat`.
 
@@ -399,22 +399,26 @@ We could use something like that to determine the file type based on the file na
 
 When you test using `=` or `==`, you always use glob patterns, but if you instead use `=~` — `[[ x =~ pat ]]` — then `pat` is interpreted as a regular expression instead of a glob.
 
-With regular expressions, `.` matches any single character. The symbol `*` means “match what was in front of it any number of times, from zero and up”. Thus, `.*` would match any number of characters, while `a*` would match any sequence of `a`. If you want an actual dot, you can escape it: `\.`. Then `\.*` would mean a sequence of dots, rather than a sequence of any symbols at all. The string `.txt` would match any four-letter string that ends with `txt` while `\.txt` will match only the string `".txt"` (a dot and then `t`, `x`, and `t`).
-
-The expression `[[ x =~ pat ]]` will evaluate to true if the pattern `pat` can be found anywhere in `x`. So, if we used something like `[[ $filename =~ \.txt ]]` we would be testing if `.txt` is found anywhere in the `$filename` string. If we were doing something like that, chances are that we wanted to know if the suffix of `$filename` was `.txt` (i.e., if it was a text file), so matching anywhere in the string is not quite good enough. No worries, though; we can also fix that with regular expressions.
-
-The symbol `$` matches the end of a string, and if you put that at the end of the pattern, the pattern has to match the end of a string and can’t just match anywhere.
-
-The file type matching, using regular expressions rather than globs, could then look like this:
+As mentioned above, we won't go into the details of regular expressions, but as an example, the string `^fo+$` will match any string that starts (`^`) with an f (`f`) and then is followed by one or more o's (`o+`) and then ends (`$`) without anything else following the o's.
 
 ```bash
-[[ $filename =~ \.txt$ ]] && echo $filename "is a .txt file"
-[[ $filename =~ \.md$ ]]  && echo $filename "is an .md file"
+~> [[ foo =~ ^fo+$ ]]; echo $?
+0
+~> [[ f =~ ^fo+$ ]]; echo $?
+1
+~> [[ fo =~ ^fo+$ ]]; echo $?
+0
+~> [[ foo =~ ^fo+$ ]]; echo $?
+0
+~> [[ foobar =~ ^fo+$ ]]; echo $?
+1
 ```
 
-This is more complicated than the glob patterns (which is why we still use those), but regular expressions are an extremely powerful tool found throughout the UNIX command line ecosphere. They can, however, be difficult to use, and it requires some practice to be proficient in writing them, so we have to leave them here for now.
+With glob pattern matching, we cannot do as detailed specifications for what we want to match as we can with regular expressions, but what regular expressions have in expressiveness, they pay for in simplicity. You can learn everything there is to know about globs in an hour, but you are likely to still find regular expressions challenging after years of experience.
 
-If you are in doubt, use the `[[ ... ]]` construction. It will almost always behave the same as `[ ... ]` (with the caveats on expansion), but it can do more.
+Anyway, enough about pattern matching.
+
+If you are in doubt about which test construction to use, `[ ... ]` or `[[ ... ]]`, use the `[[ ... ]]` construction. It will almost always behave the same as `[ ... ]` (with the caveats on text matching and variable expansion), but it can do more.
 
 ### Using `let` as `(( ... ))`
 
