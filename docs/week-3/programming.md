@@ -434,6 +434,46 @@ Double parentheses have the same meaning as using `let`, with a few modification
 
 ## If-statements
 
+We have used logical operators `&&` and `||` for control flow in forms such as these:
+
+```bash
+~> test && action # action is only run if test is true
+~> test || action # action is only run if test is false
+```
+
+With if-statements, we get the same functionality but somewhat more readable, especially if `action` is more complicated than a single command.
+
+The syntax for if-statements look like this:
+
+```bash
+if test
+then
+	action
+fi
+```
+
+or
+
+```bash
+if test; then
+	action
+fi
+```
+
+(The two are really the same since the `;` in the second version functions like a newline and generally does that in the shell, and which of the two forms you prefer is entirely a matter of taste).
+
+This construction will run `test`, and if it is true (returns with status zero), then it will also run `action`. In that sense, it works like the `test && action` construction.
+
+If you want to run `action` only when `test` is false, put a `!` in front of `test`:
+
+```bash
+if ! test; then
+	action
+fi
+```
+
+**FIXME: more here**
+
 ```bash
 #!/bin/bash
 
