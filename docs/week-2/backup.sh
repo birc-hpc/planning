@@ -17,7 +17,12 @@ read_conf || report_conf_error
 
 # Now run the backup ######################
 date=$( date +%F )
-[ -d results-$date ] || mkdir results-$date
+
+if ! [ -d results-$date ]; then
+    echo "Making backup dir results-${date}."
+    mkdir results-$date
+fi
+
 cp $( cat $important_file ) results-$date
 tar -czf results-$date.tar.gz results-$date
 rm -r results-$date

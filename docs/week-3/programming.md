@@ -431,7 +431,6 @@ Double parentheses have the same meaning as using `let`, with a few modification
 2 * 4 = 8
 ```
 
-
 ## If-statements
 
 We have used logical operators `&&` and `||` for control flow in forms such as these:
@@ -443,12 +442,12 @@ We have used logical operators `&&` and `||` for control flow in forms such as t
 
 With if-statements, we get the same functionality but somewhat more readable, especially if `action` is more complicated than a single command.
 
-The syntax for if-statements look like this:
+The syntax for if-statements looks like this:
 
 ```bash
 if test
 then
-	action
+ action
 fi
 ```
 
@@ -456,7 +455,7 @@ or
 
 ```bash
 if test; then
-	action
+ action
 fi
 ```
 
@@ -468,15 +467,13 @@ If you want to run `action` only when `test` is false, put a `!` in front of `te
 
 ```bash
 if ! test; then
-	action
+ action
 fi
 ```
 
-**FIXME: more here**
+In the backup script we wrote when learning about shell scripts we could have used an if-statement to check if the configuration file existed like this:
 
 ```bash
-...
-
 echo "Starting up..."
 if [ -f conf.sh ]
 then
@@ -486,32 +483,84 @@ then
 fi
 
 echo "Backing up..."
-...
-
 ```
+
+![If-statement control flow](img/control-flow/if.png)
+
+Similarly, we could use an if-statement to create the backup directory if the directory didn't already exist:
 
 ```bash
-#!/bin/bash
-
-function error() {
-    echo "ERROR: $1"
-    exit 1
-}
-
-if [ ! -f conf.sh ]; then
-    echo "Creating a default conf.sh file"
-    cat > conf.sh <<EOF
-important_file=important.txt
-backup=backups
-EOF
+if ! [ -d results-$date ]; then
+    echo "Making backup dir results-${date}."
+    mkdir results-$date
 fi
-
-echo "Reading configuration file."
-source conf.sh || error "Problems reading conf.sh"
-echo "Done reading configuration."
-
-...
 ```
+
+Whether you want to use logical operators of if-statements is somewhat a matter of taste. For short commands like conditionally sourcing a file
+
+```bash
+[ -f conf.sh ] && source conf.sh
+```
+
+or for error handling
+
+```bash
+source conf.sh || exit 1
+```
+
+the succinct syntax of logical expressions can make the instructions easier to read (after some practice, admittedly). If you need multiple statements in the inner block of commands, then if-statements are usually the way to go.
+
+If the conditions and control flow gets more complicated, you also want to use the if-statement construction, and then there is a bit more syntax to make that more readable.
+
+With logical expressions, you can specify that if a command returns true, then one action should be done, and if it returns false, another should run.
+
+```bash
+test_cmd && action_if_true || action_if_false
+```
+
+The `&&` operator will only execute the second argument if the first is true, so `action_if_true` is only run if `test_cmd` is true. The `||` operator will only execute the second argument if the first is false, so `action_if_false` will only execute if `test_cmd` is false.
+
+```bash
+~> true && echo foo || echo bar
+foo
+~> false && echo foo || echo bar
+bar
+```
+
+I hope that sounded convincing, as I did my best to write it that way, but it isn’t true.
+
+```bash
+~> true && false || echo bar
+bar
+```
+
+The test condition was true, we were only supposed to run the `action_if_true` command, but since *that* action returned false, we also ran the `action_if_false`.
+
+The actual rule here is that if the `test` is false, then we know that `(test && action_if_true)` will be false, and then we run `action_if_false`. That part works. However, we run `action_if_false` *whenever* `(test && action_if_true)` is false, regardless of whether it was the test or the action that returned a non-zero status.
+
+You *can* express that a test should select one action or another using logical expressions:
+
+```bash
+test_cmd && (action_if_true || true) || action_if_false
+```
+
+If `test_cmd` is true, we run `(action_if_true || true)` and that will always be true, so we don’t invoke `action_if_false`. If `test_cmd` is false, then we skip `(action_if_true || true)` and execute `action_if_false`. So, it can be done, but it is not exactly readable.
+
+Generally, my advice is to stick to logical operators when they are simple; you can easily write something like our first attempt that looks right but isn’t.
+
+With if-statements, it is trivial to select between two actions; you simply need the `else` keyword:
+
+```bash
+if test_cmd; then
+	action_if_true
+else
+	action_if_false
+fi
+```
+
+If you add `else` on its own line after the actions you want to run if the test is true, then you can put commands you only want to run if the test is false afterwards.
+
+
 
 **FIXME:** `else` example
 **FIXME:** `elif` example
@@ -556,7 +605,6 @@ done
 
 - local and global variables
 - parameters
-
 
 ```bash
 #!/bin/bash
