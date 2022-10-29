@@ -431,21 +431,19 @@ Double parentheses have the same meaning as using `let`, with a few modification
 ## If-statements
 
 ```bash
-#!/bin/bash
+...
 
-function error() {
-    echo "ERROR: $1"
-    exit 1
-}
-
+echo "Starting up..."
 if [ -f conf.sh ]
 then
     echo "Reading configuration file."
-    source conf.sh || error "Problems reading conf.sh"
+    source conf.sh
     echo "Done reading configuration."
 fi
 
+echo "Backing up..."
 ...
+
 ```
 
 ```bash
@@ -514,3 +512,22 @@ done
 
 - local and global variables
 - parameters
+
+
+```bash
+#!/bin/bash
+
+function error() {
+    echo "ERROR: $1"
+    exit 1
+}
+
+if [ -f conf.sh ]
+then
+    echo "Reading configuration file."
+    source conf.sh || error "Problems reading conf.sh"
+    echo "Done reading configuration."
+fi
+
+...
+```
