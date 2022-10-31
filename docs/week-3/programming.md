@@ -567,7 +567,72 @@ If you add `else` on its own line after the actions you want to run if the test 
 
 ## Cases
 
+The `case … in` construction works much like the `if … elif …` construction in that it checks a sequence of conditions and picks the first that is satisfied. After that, though, the similarities end.
+
+With `case`, you will check a string against a number of patterns, and the first pattern that matches the string determines which actions you will execute. The overall syntax looks like this:
+
+```bash
+case text in
+   pat1)
+	   actions
+	   ;;
+   pat2)
+	   actions
+	   ;;
+   ...
+esac
+```
+
+The patterns you test look like globs with a few modifications:
+
+ - Most characters (any character that doesn't have a special meaning as described above) match themselves.
+ - `?` matches any single character.
+ - `*` matches any sequence of characters.
+ - `$var` will expand the variable before matching.
+ - `[abc...]` will match any of the characters in the `[…]` brackets.
+ - `[a-z]` will match any one character in the range of characters.
+ - `pat1 | pat2` will match either `pat1` or `pat2`.
+
+If you match a pattern, you will execute the actions in its associated block, and that block is terminated by `;;`.
+
+For a concrete example, consider classifying a file based on its filename. The suffixes in file names are often used to indicate what type of file we have, and we can exploit that in a `case` statement like this:
+
+```bash
+case $filename in
+    *.txt)
+        echo "$filename is a text file"
+        ;;
+    *.md)
+        echo "$filename is a markdown file"
+        ;;
+    *.sh)
+        echo "$filename is a shell script"
+        ;;
+    *)
+        echo "I don't know what $filename is"
+        ;;
+esac
+```
+
+If you don't mind a more coarse-grained classification, we can try the `pat1 | pat2` patterns (and you will notice that this works for more than two patterns as well):
+
+```bash
+case $filename in
+    *.txt | *.md)
+        echo "$filename is a text file"
+        ;;
+    *.sh | *.py | *.r | *.R)
+        echo "$filename is a script"
+        ;;
+    *)
+        echo "I don't know what $filename is"
+        ;;
+esac
+```
+
 ## While loops
+
+
 
 ```bash
 cat file.txt | while read line; do
