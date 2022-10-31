@@ -630,17 +630,78 @@ case $filename in
 esac
 ```
 
-## While loops
 
+## For loops
 
+We have managed so far to avoid loops, but that ends now. Sometimes, you need to deal with a sequence of objects, and you don't want to write the same commands over and over again. For that, we have loops, of which there are two kinds: `for` loops and `while` loops. We discuss the `for` loops first.
+
+The syntax for a `for` loop is this:
 
 ```bash
-cat file.txt | while read line; do
-  echo $line
+for var in <what you want to run through>
+do
+	<what you want to do>
 done
 ```
 
-## For loops
+The `<what you want to run through>` can be many things, basically anything that gives you a sequence of something. What will happen with the `for` loop is that the variable `var` is set to each of the elements in `<what you want to run through>` in turn, and then all commands between `do` and `done` are run.
+
+One of the simplest things we can iterate over, and one of the most useful, is filenames. The glob `*` matches all the files in the current directory (well, all the visible ones anyway), as you already know from `ls *`. If you want to loop through them, you can use the following:
+
+```bash
+for file in *
+do
+	echo $file
+done
+```
+
+Let's make things a little more interesting. We can run through all the files in the current directory and classify them according to type, similar to what we did above with the `case` construction.
+
+```bash
+for filename in *
+do
+    case $filename in
+        *.txt | *.md) textfiles="$textfiles $filename" ;;
+        *.sh | *.py | *.r | *.R) scripts="$scripts $filename" ;;
+        *) unknown="$unknown $filename" ;;
+    esac
+done
+```
+
+We put each file into one of three variables, `textfiles`, `scripts`, or `unknown`. These are variables that initially do not exist, but we create them the first time we assign to them. (If we read them before then, we will get the empty string, which is acceptable for our purposes).
+
+Iterating through all files, we will put each file in one of the file type variables, and at the end, each of the three variables will have a space-separate list of filenames. Such a space-separated sequence is also something we can iterate through, and we can use that to print the filess:
+
+```bash
+filetypes="textfiles scripts unknown"
+for filetype in $filetypes
+do
+    echo ${filetype}
+    # Get the var name from $filetype, e.g. scripts, then
+    # get the values in that var, e.g. $scripts.
+    files_of_type=${!filetype}
+    for filename in files_of_type; do
+        echo " - $filename"
+    done
+    echo # newline
+done
+```
+
+The `filetypes` variable is a sequence of the three file types.
+
+```bash
+filetypes="textfiles scripts unknown"
+```
+
+We iterate through it with a `for` loop, setting the variable `$filetype` to each of the values in turn. The construction `${!filetype}` is not one we have used before, but it will get the value in `filetype` (one of `textfiles`, `scripts` or `unknown`) and then evaluate the variable expansion once more to get the filenames of the given type. So the expansion could go like this:
+
+```bash
+${!filetype} -> $scripts -> "foo.sh bar.sh qux.py"
+```
+
+Once expanded this way, we have a list of file names, and those we can iterate through in the inner `for` loop to print the names.
+
+**FIXME**
 
 ```bash
 for i in {1..5}; do
@@ -655,14 +716,16 @@ done
 ```
 
 ```bash
-for i in /etc/rc.*; do
-  echo $i
+for (( i=0; i < 10; i++ )); do
+ echo $i
 done
 ```
 
+## While loops
+
 ```bash
-for (( i=0; i < 10; i++ )); do
- echo $i
+cat file.txt | while read line; do
+  echo $line
 done
 ```
 
