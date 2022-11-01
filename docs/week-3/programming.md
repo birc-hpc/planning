@@ -552,18 +552,210 @@ With if-statements, it is trivial to select between two actions; you simply need
 
 ```bash
 if test_cmd; then
-	action_if_true
+ action_if_true
 else
-	action_if_false
+ action_if_false
 fi
 ```
 
 If you add `else` on its own line after the actions you want to run if the test is true, then you can put commands you only want to run if the test is false afterwards.
 
+Let’s play a bit with an example. You probably love Googling yourself (because who doesn’t), but would you like to know how to see if any file mentions you? Let’s write a script for that!
 
+The command `whoami` will return your username, and that is what we will search for. We will use the command `grep` to scan through files to find it. The command
 
-**FIXME:** `else` example
-**FIXME:** `elif` example
+```bash
+~> grep $(whoami) *
+```
+
+will look at all the files in your current directory. Remember here that when we write `$(whoami)`, we run the command `whoami`, take the output, and paste it into the command line, so what `grep` sees is your username, not `$(whoami)`.
+
+If `grep` finds anything, it should return the status zero, so success or true, and if it doesn’t, it will return false. So, something like this will tell you if someone has mentioned you:
+
+```bash
+if grep $(whoami) *
+then
+    echo "Someone is thinking of me"
+else
+    echo "No one cares about me!"
+fi
+```
+
+Well, not quite. Nothing is ever simple. While `grep` will return non-zero (false) when it doesn’t find what it is searching for, it will also return false if there are any errors. If you run this in a directory that contains other directories, it will complain that it can’t search in those, and it will return false regardless of whether it finds your username:
+
+```bash
+~> grep $(whoami) *
+grep: img: Is a directory
+programming.md:/home/mailund
+programming.md:/home/mailund
+~> echo $?
+2
+```
+
+Here, it finds `mailund` (which happens to be my username) twice in the file `programming.md` (which happens to be this file), but the return status is two because it couldn’t search in `img`, which is a directory. If I used this test, I would falsely conclude that no one cares about me (which I know, dear reader, that you do).
+
+Ok, first attempt to fix this: if you use `ls -p` it will add `/` to the end of directories, and if you then run that through `grep -v /` it will give you all the files that do not (`-v`) contain a slash. So this command will grep only in regular files:
+
+```bash
+~> grep $(whoami) $(ls -p | grep -v /)
+```
+
+Are you beginning to see how powerful the shell is yet when you can combine small commands to create more complex ones?
+
+With that insight, we can update the script to:
+
+```bash
+if grep $(whoami) $(ls -p | grep -v /)
+then
+    echo "Someone is thinking of me"
+else
+    echo "No one cares about me!"
+fi
+```
+
+You get the output from the outer `grep` command when you run this, and if that contains a lot of lines there are two observations: you are popular, congratulations, and all those lines will swamp the `echo` command we carefully put in our script. Instead of that, we can collect the files you are mentioned in and print only those.
+
+To do that, remember (or read `man grep`) that the option `-l` will make `grep` print the file names only.
+
+```bash
+~> grep -l $(whoami) $(ls -p | grep -v /)
+programming.md
+```
+
+It appears that I am only mentioned in one file…
+
+If you are looking only in your own directory, then this will probably suffice, but the script isn’t quite perfect yet. We will still get errors from `grep` if we try to scan a file we do not have read permissions for. The `ls -p | grep -v /` trick will only tell us which files are directories, but not if we have a regular file that `grep` cannot scan. To fix that, we need to abandon `ls` and `grep` and use a new command you haven’t seen before: `find`. You use it to, well, find files, and you can use a ton of options to specify which files to find. We will use the command to search only the current directory `.` and not into sub-directories `-maxdepth 1`, and we will tell it to find regular files `-type f`.
+
+```bash
+~> find . -maxdepth 1 -type f
+```
+
+If we then use the `$(...)` construction, we can get the output and give it to `grep` as the files to search in:
+
+```bash
+~> grep -l $(whoami) $(find . -maxdepth 1 -type f)
+```
+
+If you prefer, you could also put the result of `find` in a variable, so you don’t have too much going on in a single command:
+
+```bash
+~> files=$(find . -maxdepth 1 -type f)
+~> grep -l $(whoami) $files
+```
+
+If we go completely crazy, we can now put the entire `grep` command in `$(...)` so we can get both its output—the files we are mentioned in—and the status of the search:
+
+```bash
+files=$(find . -maxdepth 1 -type f)
+if me_files=$(grep -l $(whoami) $files)
+then
+    echo "I am mentioned in: ${me_files}"
+else
+    echo "No one cares about me!"
+fi
+```
+
+If you feel that this is too messy and that too much is going on in the test, then you can move the `grep` command out of the test.
+
+```bash
+files=$(find . -maxdepth 1 -type f)
+me_files=$(grep -l $(whoami) $files)
+```
+
+You can still assign its output to the variable, but now you cannot test the return status directly. However, as we’ve seen many times, the status of the last command is in the variable `$?` and we can exploit that. You cannot do `if $? …` since `$?` is not a command, but you can use the `(( ... ))` construction to test if it is zero:
+
+```bash
+files=$(find . -maxdepth 1 -type f)
+me_files=$(grep -l $(whoami) $files)
+if (( $? == 0 ))
+then
+    echo "I am mentioned in: ${me_files}"
+else
+    echo "No one cares about me!"
+fi
+```
+
+This only works for testing the status of the last command you ran, but if you want to save the status you can put it in a variable. We can, for example, use the `(( … ))` construction of the `let` command to set a variable to true or false depending on the previous command’s status, and then later use `(( ... ))` to test the variable:
+
+```bash
+files=$(find . -maxdepth 1 -type f)
+me_files=$(grep -l $(whoami) $files)
+(( found_me = ? == 0 )) # Use (()) to set found_me
+
+if (( $found_me ))
+then
+    echo "I am mentioned in: ${me_files}"
+else
+    echo "No one cares about me!"
+fi
+```
+
+You cannot use `if $found_me …` like that, since `$found_me` is not a command, but by putting it in `(( ... ))`, we turn it into a command, and it will be true if `found_me` is true, and because we set `found_me` to `$? == 0` right after the `grep` command, `$found_me` is true if the `grep` command succeeded and false otherwise.
+
+I write `(( $found_me ))` in the if-statement’s test to make it clear that `$found_me` is a shell variable, but since we are inside `(( ... ))`, you can leave out the `$` and write `(( found_me ))`. That is a matter of taste. The same goes for using `(( ... ))` for setting the variable. The `let` command (with quotes where necessary) would work just as well:
+
+```bash
+let "found_me = $? == 0"  # Use 'let' to set found_me
+```
+
+Now that I come to think of it, though, we might have been looking too binary on popularity. It is not like being mentioned or not is the statistics we should focus on. After all, it is little consolation to be mentioned once or twice if everyone else is mentioned a ton of times.
+
+Let’s count how many times we are mentioned.
+
+We used `grep -l` to get the files we are mentioned in. Remove that option, and `grep` will give us each line we are mentioned in. Now, we could be mentioned twice in the same line, like right here: `thomas mailund is the greatest mailund`, but counting occurrences per line is extra work, and for the little expected gain from it, it isn’t worth it. We will settle for counting the lines we are mentioned in. To get that, get the lines from `grep` and count them with `wc -l`:
+
+```bash
+files=$(find . -maxdepth 1 -type f)
+mentions=$(grep $(whoami) $files | wc -l)
+```
+
+Now, `$mentions` contains the number of times we are mentioned (or at least the number of lines we are mentioned in), and we can use that to graduate how popular we are:
+
+```bash
+if (( mentions > 10 ))
+then
+    echo "I should be making that influencer big bucks!"
+else
+    if (( mentions > 5 ))
+    then
+        echo "Ok, at least I'm more popular than Dan Søndergaard"
+    else
+        if (( mentions > 0 ))
+        then
+            echo "At least my mother cares..."
+        else
+            echo "No one cares about me!"
+        fi
+    fi
+fi
+```
+
+At this point, I should probably tell you that the whole popularity story was a ruse. I wanted to get to this point and show you that you can nest if-statements and also show you that nesting deeper and deeper looks ugly.
+
+In this example, we choose different actions based on the value of `mentions`, and if you look carefully, you will see that the conditions are non-overlapping. If `mentions > 10`, we only do the “true” part for the test. If `mentions` is smaller or equal to 10, we go to the else part, and there we do the first action if `mentions > 5`, so that part is done only when `5 < mentions <= 10`. If that isn’t true, we know `mentions <= 5`, and we choose two different actions depending on whether `0 < mentions <= 5` or `mentions == 0`.
+
+When you have a series of tests, and you pick the first that is true, you can use another construction: `elif`. It works just as the nested if-statements but without all the crazy nesting.
+
+```bash
+if (( mentions > 10 ))
+then
+    echo "I should be making that influencer big bucks!"
+elif (( mentions > 5 ))
+then
+    echo "Ok, at least I'm more popular than Dan Søndergaard"
+elif (( mentions > 0 ))
+then
+    echo "At least my mother cares..."
+else
+    echo "No one cares about me!"
+fi
+```
+
+![elif construction](img/control-flow/elif.png)
+
+You can have as many as you like after the first `if`, and you can leave out the final `else` part if you don’t need it. When bash processes it, it will evaluate the tests from top to bottom, and the first time something is true, it will do that branch of the statement, and when done, it will skip past the rest of the blocks to the final `fi`.
+
+Sometimes, you do want to nest if statements. The `elif` construction only handles when you have a sequence of test conditions and you want to execute the commands associated with the first true test. When things are more complicated than that, nesting, or perhaps a mix of `elif` and nested if statements, is the way to go.
 
 ## Cases
 
