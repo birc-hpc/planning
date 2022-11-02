@@ -893,7 +893,17 @@ ${!filetype} -> $scripts -> "foo.sh bar.sh qux.py"
 
 Once expanded this way, we have a list of file names, and those we can iterate through in the inner `for` loop to print the names.
 
-**FIXME**
+Any shell expression—variable expansion or command or whathaveyou—that generates a list of words can be used for a for loop, so we could also run through the words in a file by `cat`'ing its content:
+
+```bash
+for word in $( cat file.txt ); do
+    echo $word
+done
+```
+
+Keep in mind, however, that you are iterating through the words (i.e. space-separated strings) in the file. You are not reading the file line by line. For that, we need a different construct, a `while` loop with the `read` command, as we shall see shortly.
+
+If you want to iterate through a sequence of integers, something that might be more familiar to you if you have experience with programming, then you can exploit that bash will expand an expression like `{from..to}` into the sequence `from from+1 from+2 … to` (notice that `to` is included in bash, unlike some languages). To loop through the numbers one to five, you can thus write:
 
 ```bash
 for i in {1..5}; do
@@ -901,11 +911,15 @@ for i in {1..5}; do
 done
 ```
 
+This expansion syntax also allows for step sizes, `{from..to..step}`, so the following will go through the numbers five to fifty in steps of five:
+
 ```bash
 for i in {5..50..5}; do
     echo $i
 done
 ```
+
+If you are familiar with C-family languages, you also get the syntax for that. It is less elegant, in my opinion, but it will perhaps be familiar to you. This will run through the numbers from zero up to (but not including) ten:
 
 ```bash
 for (( i=0; i < 10; i++ )); do
@@ -913,18 +927,139 @@ for (( i=0; i < 10; i++ )); do
 done
 ```
 
-## While loops
+and this will do it in steps of two:
+
+```bash
+for (( i=0; i < 10; i += 2 )); do
+ echo $i
+done
+```
+
+## Until and while loops
+
+The `until` and `while` constructions do essentially the same thing. With `until`:
+
+```bash
+until cmd; do
+	something
+done
+```
+
+you will repeatedly do `something` until `cmd` returns a false status, and with `while`:
+
+```bash
+while cmd; do
+	something
+done
+```
+
+you will repeat `something` until `cmd` evaluates to false.
+
+As a somewhat artificial example of using `until`, consider picking random numbers but rejecting any numbers not between 10 and 1000. (I said it was artificial, there is no need for rejection sampling here, but it is just an example).
+
+```bash
+until (( x=$RANDOM, 10 <= x && x < 1000 )); do
+    echo "${x} is not good enough"
+done
+echo "Let's go with ${x}"
+```
+
+Here, the command after `until` is `(( x=$RANDOM, 10 <= x && x < 1000 ))`, so we are using the `((...))` construction. We have two expressions inside: one that sets `x` to a random number, `x=$RANDOM` (the variable `$RANDOM` will give you a random number), and the second expression is the test `10 <= x && x < 1000` which tests if `x` is in the right range. Inside the loop body, we print the value we rejected, so here, `$x` is outside the desired range, but if it ever hits inside the range, we leave the loop and print the final value.
+
+As another example, imagine you have some job running that will `touch done.txt` when it is done. This script will then wait for completion and inform you about it:
+
+```bash
+until [[ -e done.txt ]]; do
+    sleep 60 # Wait a minute and try again
+done
+echo "The job has been completed."
+```
+
+As we saw with the `for` loops above, we can run through all the words in a file using a loop and `cat`. To read the file line by line, however, we need the command `read`. It will read one line from `stdin` at a time (although options can change that a bit) and it will return true as long as it gets a line and false when there are no more.
+
+```bash
+while read line; do
+    echo $line
+done
+```
+
+When we call `read` in this code, it will read the next line from `stdin` and put it, without the newline character `\n` in `line`, and inside the loop body, we print the line.
+
+Since `read` will read from `stdin`, you need to give it the file data on `stdin` if you want it to read from anywhere else, but you can do that using `cat`.
+
+You cannot do
+
+```bash
+while read line < file; do
+	echo $line
+done
+```
+
+because then the command you are testing, `read line < file` is executed every time the loop returns to the test, and you will only ever get the first line in the file. Instead, you can `cat` to the entire loop:
 
 ```bash
 cat file.txt | while read line; do
-  echo $line
+    echo $line
 done
+```
+
+This will usually get whatever you need to do done, but there is a twist that can easily trip you up. When you pipe into a loop, the loop is run in a subshell—similar to when you run commands in parentheses. This won't be a problem most of the time, but if you use variables, it can be. Remember that variables you set in a subshell won't be seen in the calling shell.
+
+If you tried to count the lines and words in a file, and then printing the results after the loop, you might write something like this:
+
+```bash
+linecount=0
+wordcount=0
+cat file.txt | while read line; do
+    (( linecount++ ))
+    for word in $line; do
+        (( wordcount++ ))
+    done
+done
+echo $linecount $wordcount
+```
+
+You might also be surprised that the result is always `0 0`.
+
+It is not that the `while`-loop doesn't run, it does, and you can check that by printing something inside the loop. The cases is that the `linecount` and `wordcount` variables you update inside the loop are in a separate shell, and when the loop terminates, and the subshell is gone, you have lost the counts.
+
+One way around this is to not use `cat` but redirect the file into the loop. This works differently than redirecting into `read` (which we saw didn't work), because now the redirected file is the input to the entire loop and not just the `read` command, and when you do it that way, you don't run the loop in a subshell.
+
+```bash
+while read line; do
+    (( linecount++ ))
+    for word in $line; do
+        (( wordcount++ ))
+    done
+done < file.txt
+echo $linecount $wordcount
+```
+
+(This time around, I didn't initialise the variables to zero; they will be that by default, so I left it out. Whether you want to do that or not is a matter of taste. I usually do, but I got tired of typing here, so I didn't this time).
+
+One annoying thing about this solution is that the input file is hidden at the end of the loop, so it can be hard to figure out what is going on up front.
+
+The third option is a little ugly since it involves opening and closing files explicitly. We can open a file and get a so-called *file descriptor*. File descriptors are numbers that UNIX uses to refer to open files, and the three pipes we have automatically are already file descriptors (`stdin` is 0, `stdout` is 1, `stderr` is 2). The `read` command can read from a file descriptor other than 0 (`stdin`).
+
+You can open a new file and get its file descriptor with `exec {fd}<>file.txt`. Then the file descriptor is saved in `$df`. Once you have it, you can redirect the new file descriptor into `read`'s `stdin` with `<& $fd`, and that way read from the file. When you are done, you must close the file descritptor with `exec {df}<&-`. It's not pretty—I warned you—but it works.
+
+```bash
+exec {fd}<>file.txt # Open file as fd
+while read line <& $fd; do # Read from fd
+    (( linecount++ ))
+    for word in $line; do
+        (( wordcount++ ))
+    done
+done
+exec {fd}<&- # Close fd
+echo $linecount $wordcount
 ```
 
 ## Functions
 
 - local and global variables
 - parameters
+- return values
 
 ```bash
 #!/bin/bash
