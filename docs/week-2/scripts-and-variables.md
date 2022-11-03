@@ -482,7 +482,7 @@ Any UNIX process has a list of arguments, from one and up. Not zero, but one, be
 
 ![Process with arguments](img/processes/process-with-args.png)
 
-How different languages deal with arguments can vary, but bash was built for UNIX, and it has the same philosophy. When you are running a shell script, the variable `$0` will hold the script’s name, `$1` is the first argument you gave the script, `$2` is the second, and so on. In addition, if you want an expansion of *all* the arguments (excluding the script name), you can use `$@`, and if you want the number of arguments (also excluding the script name), you can use `$#`. Try it with this script (and remember to give it execution permission):[^1]
+How different languages deal with arguments can vary, but bash was built for UNIX, and it has the same philosophy. When you are running a shell script, the variable `$0` will hold the script’s name, `$1` is the first argument you gave the script, `$2` is the second, and so on. In addition, if you want an expansion of *all* the arguments (excluding the script name), you can use either `$@` or `$*` with the former expanding to all the variables as separate strings and the latter expanding to a single string holding them. If you want the number of arguments (also excluding the script name), you can use `$#`. Try it with this script (and remember to give it execution permission):[^1]
 
 [^1]: The `\"...\"` might look odd, but this is what it is doing: I wanted to put the list of arguments in quotes. If I just use `"..."` I get a string containing the list of arguments, and that would expand to just the arguments. I would lose the quotes. But by *escaping* the quotes with a backslash, I tell bash to use the literal symbol, so it will include the two quotes in the output instead of trying to be clever about it and interpret it as a string.
 
@@ -490,13 +490,14 @@ How different languages deal with arguments can vary, but bash was built for UNI
 #!/bin/bash
 
 echo All $# arguments: \"$@\"
+echo All $# argumens are also: \"$*\"
 echo The script is named $0
 echo Argument 1: $1
 echo Argument 2: $2
 echo Argument 3: $2
 ```
 
-The `$@` and `$#` variables have horrible names. I don't know why shell people insist on using what looks like line noise for variables, but they do. It is what it is, though. At least it is reasonably easy to remember the positional arguments.
+The `$@`, `$*`, and `$#` variables have horrible names. I don't know why shell people insist on using what looks like line noise for variables, but they do. It is what it is, though. At least it is reasonably easy to remember the positional arguments.
 
 Let's try to add arguments to our backup script. Maybe we have decided that we want to use it in other projects, so we want to add an option for where the script should run, where the file that contains the list of other files to back up is, and where the backup directory is. We still want to be able to run the script without arguments as before, so we add default arguments to all the options. That could look like this:
 

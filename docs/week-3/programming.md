@@ -1057,24 +1057,136 @@ echo $linecount $wordcount
 
 ## Functions
 
-- local and global variables
-- parameters
-- return values
+We already saw functions when we learned how to write scripts. They work much the same way that scripts do, except that scripts are files, and functions are some syntax we give bash to tell it that we want a new command, what the command should be, and what it should do.
+
+```bash
+function name() {
+	command1
+	command2
+	command3
+}
+```
+
+(The `function` in front of the name is optional).
+
+There is a little more to them, though, and we will finish this lesson by digging into that.
+
+### Function arguments
+
+Functions can take arguments the same way as scripts or programs can. Just like with scripts, the arguments are found in variables `$`*i* where *i* is a number. The variable `$0` refers to the name of the function (the same way that `$0` refers to the name of a script when you are running such a beast), the variable `$1` is the first argument, `$2` is the second, and so on. In addition, `$@` will expand to all the variables as separate strings and `$*` to all the variables as a single string (again, same as for scripts).
+
+The function and script arguments are separate entities, even though they have the same names. If you ran this script
 
 ```bash
 #!/bin/bash
 
+show_args() {
+    echo "Function arguments: $@"
+}
+
+echo "Script arguments: $@"
+show_args foo bar baz
+echo "Script arguments: $@"
+```
+
+the function arguments would always be `foo bar baz` regardless of what arguments you gave the script.
+
+Having parameters is, not surprisingly, a useful thing to have. In the script we wrote earlier, we used a function for error handling like this:
+
+```bash
+function report_conf_error() {
+    echo "Couldn't open conf.sh!"
+    exit 1  # Exiting 1 means we are not claiming success
+}
+```
+
+This function, however, is hardwired to mention `conf.sh`. Using a parameter, we can make a more general function, for example, something like this:
+
+```bash
 function error() {
     echo "ERROR: $1"
     exit 1
 }
+```
 
+that we could then use like this:
+
+```bash
 if [ -f conf.sh ]
 then
     echo "Reading configuration file."
     source conf.sh || error "Problems reading conf.sh"
     echo "Done reading configuration."
 fi
-
-...
 ```
+
+A function works like a command, so you can catch its output as you can any other command:
+
+```bash
+greet() {
+    echo "${1},  world!"
+}
+
+echo $(greet hello) # hello, world
+echo $(greet howdy) # howdy, world
+```
+
+Here, we create a function, `greet`, that will print its argument and then `, world!`. If we call `greet hello`, it will print that to standard out, but if we catch it in `$(greet hello)` or `$(greet howdy)`, we catch the output and can use it in the main script.
+
+A function call also has a return status. This will be the status of the last command you run in it. Consider this example:
+
+```bash
+read_conf() {
+    # Function will source conf.sh if
+    # it exists. Its return status
+    # depend on whether we succeeded
+    [ -f conf.sh ] && source conf.sh
+}
+read_conf || error "Problems reading conf.sh"
+```
+
+The `read_conf` function will try to source `conf.sh` if it exists. If everything goes right, its last (and only) command `[ -f conf.sh ] && source conf.sh` will give us a 0 return status, and that is what `read_conf` will return as well. If anything goes wrong, whatever non-zero status we get will also be the status of the function.
+
+If you want to explicitly return a specific value, you can use `return`:
+
+```bash
+read_conf() {
+    if [ -f conf.sh ]; then
+        echo "Reading conf.sh"
+        source conf.sh
+    else
+        echo "File doesn't exist"
+        return 1
+    fi
+}
+
+error() {
+    echo $1
+    exit 1
+}
+
+read_conf || error "Problems reading conf.sh"
+```
+
+Notice that `return` and `exit` are very different commands. The `return` command will return from the function, but `exit` will terminate the entire script.
+
+Variables you use inside functions can be either global or local. They are global by default, and being global means that what you set them to inside the function will also be their value outside the function. Local variables are declared with the keyword `local`, and these work like variables in a sub-shell: whatever you set them to inside the function won’t change what variables with the same name outside the function will contain.
+
+Consider this code to illustrate the difference between local and global variables:
+
+```bash
+set_vars() {
+    x="this is x in the function"
+    local y="this is y in the function"
+    echo "Inside function: x=${x}, y=${y}"
+}
+
+x="global x"
+y="global y"
+
+echo "Outside function: x=${x}, y=${y}"
+set_vars
+echo "Outside function: x=${x}, y=${y}"
+```
+
+Outside the function, we set `x` and `y` and print their values. Then we call the function, and inside the function, we also set `x` and `y`, but `y` inside the function is declared `local`. We print their new values and return from the function. Then we print the variables outside the function again. Here, we will see that the value of `x` was updated when we wrote to it in the function, but the value of `y` was not. The `x` we assigned to inside the function was the global one, so it has changed, but the `y` was local to the function, so we never touched the `y` outside the function.
