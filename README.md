@@ -3,10 +3,10 @@
 Tentative schedule:
 
 - **Week 01**
-  - [ ] Getting an account on [genome.au.dk](https://genome.au.dk), logging in using `ssh`.
-  - [ ] [Cluster architecture (your computer, frontend, nodes, ...)](docs/week-1/architecture.md)
+  - [x] [Getting started](docs/week-1/getting-access.md)
   - [x] [Basic UNIX command line](docs/week-1/basic-unix-commands.md)
   - [x] [Navigating the file system](docs/week-1/navigating-file-system.md)
+  - [ ] [Cluster architecture (your computer, frontend, nodes, ...)](docs/week-1/architecture.md)
 
 - **Week 02**
   - [ ] Getting files and software (conda, scp, rsync, wget, git)
@@ -15,7 +15,7 @@ Tentative schedule:
   - [x] [Scripts and variables.](docs/week-2/scripts-and-variables.md)
 
 - **Week 03**
-  - [ ] [BASH programming](docs/week-3/programming.md)
+  - [x] [BASH programming](docs/week-3/programming.md)
 
 - **Week 04**
   - [ ] ~[*Reproducible research?*](docs/week-4/reproducible-research.md)~
