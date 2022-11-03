@@ -7,3 +7,13 @@
   - `ssh` as the (secure shell) connection between your terminal and the shell at the cluster.
 - Computing nodes behind the front-end.
 - Your files and the (shared) file system on the cluster.
+
+Somewhere here, set up ssh between frontend and nodes
+
+  Now, set up public-key access to all compute nodes. On the frontend, run the same ssh-keygen command as before:
+
+  [fe-open-01]$ ssh-keygen
+  Again, just press Enter to use the default values (and do not type in a password). Then run:
+
+  [fe-open-01]$ cat ~/.ssh/id_rsa.pub >> authorized_keys
+  You will now be able to SSH between compute nodes without typing a password.
