@@ -18,7 +18,8 @@ Tentative schedule:
   - [ ] [BASH programming](docs/week-3/programming.md)
 
 - **Week 04**
-  - [ ] [*Reproducible research?*](docs/week-4/reproducible-research.md)
+  - [ ] ~[*Reproducible research?*](docs/week-4/reproducible-research.md)~
+  - [ ] Resources
   - [ ] Regular expressions + `sed` and `awk`?
 
 - **Week 05**
