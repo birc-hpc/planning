@@ -1,5 +1,11 @@
 # Cluster architecture
 
+If this is your first trip into a UNIX cluster wonderland, and if you are reading this, it probably is, you should be aware of a few differences between working on your personal computer and working on a system like this. In this note, we will have a look at a few of the differences.
+
+
+
+——
+
 - Your machine, connected to the front-end.
 - Communicating with the front-end:
   - A terminal (now a program) sending, receiving and displaying text.
