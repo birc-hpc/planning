@@ -1,5 +1,9 @@
 # Cluster architecture
 
+When you log into the cluster, two programs on two distinct computers are in play: the terminal you used to log in, running on your own computer, and the shell, running on the cluster's front-end computer.
+
+**FIXME**
+
 - Your machine, connected to the front-end.
 - Communicating with the front-end:
   - A terminal (now a program) sending, receiving and displaying text.
