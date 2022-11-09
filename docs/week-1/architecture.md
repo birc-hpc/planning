@@ -127,8 +127,27 @@ The front end's only job is to work as an intermediate between you and the clust
 +--------------------------------------------------------------------------------+
 ```
 
-
 **FIXME**
+
+```
+    All partitions and the nodes in them. Each node shows available
+    memory and a symbol for each core in the machine.
+    The meaning of each type of symbol is described in the following
+    table:
+
+    Symbol | Meaning
+         . | Available core
+         _ | Allocated core
+         O | Loaded core
+         ! | Load is significantly higher than allocated core count
+         ? | Load is unknown
+    If a node contains GPUs they will get their own symbols after the symbols
+    for the cores.
+    The symbols for GPUs are as follows:
+    Symbol | Meaning
+         * | Unallocated GPU
+         G | Allocated GPU
+```
 
 **FIXME**
 
@@ -139,6 +158,7 @@ The front end's only job is to work as an intermediate between you and the clust
   - `ssh` as the (secure shell) connection between your terminal and the shell at the cluster.
 - Computing nodes behind the front-end.
 - Your files and the (shared) file system on the cluster.
+- Get interactive shell on one of the nodes: `srun --pty /bin/bash` (`--pty` pseudo terminal, type `exit` or press `Ctrl-D` when done).
 
 Somewhere here, set up ssh between frontend and nodes
 
