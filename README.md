@@ -19,8 +19,8 @@ Tentative schedule:
   - [ ] Resources--what are the main resources? where should you run jobs?
 
 - **Week 04**
-  - [ ] [*Reproducible research? (conda etc. for software. Versions of data?)](docs/week-4/reproducible-research.md)~
-  - [ ] Regular expressions + `sed` and `awk`?
+  - [ ] [Reproducible research? (conda etc. for software. Versions of data?)](docs/week-4/reproducible-research.md)
+  - [ ] Regular expressions + `grep`, `sed`, and `awk`?
 
 - **Week 05**
   - [ ] [Queue system (submit, status, log, ...)](docs/week-5/the-queue-system.md)
