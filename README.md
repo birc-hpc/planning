@@ -16,7 +16,7 @@ Tentative schedule:
 
 - **Week 03**
   - [x] [BASH programming](docs/week-3/programming.md)
-  - [ ] Resources
+  - [ ] Resources--what are the main resources? where should you run jobs?
 
 - **Week 04**
   - [ ] [*Reproducible research? (conda etc. for software. Versions of data?)](docs/week-4/reproducible-research.md)~
@@ -24,7 +24,7 @@ Tentative schedule:
 
 - **Week 05**
   - [ ] [Queue system (submit, status, log, ...)](docs/week-5/the-queue-system.md)
-  - [ ] Exercises with submitting different kinds of jobs
+  - [ ] Asking for the right resources for the job?
 
 - **Week 06**
   - [ ] [Workflows (`gwf`)](docs/week-6/workflows.md)
