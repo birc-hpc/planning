@@ -12,7 +12,6 @@ If you are using Windows 10 or later, you can use **PowerShell** as your termina
 
 If you are using a version of Windows older than 10, you can install [MobaXterm](https://mobaxterm.mobatek.net/) to get both a terminal and `ssh`.
 
-
 ## Your first login
 
 After you have been granted access to the cluster, get on AU’s network (either via VPN or by being physically on campus), then open your terminal and type:
@@ -52,7 +51,7 @@ Give it the password you received when you got the account, hit enter, and if ev
 [USERNAME@fe-open-01 ~]$
 ```
 
-You are now logged into the front-end of the cluster. The string 
+You are now logged into the front-end of the cluster. The string
 
 ```bash
 [USERNAME@fe-open-01 ~]$
@@ -85,6 +84,10 @@ in your terminal, I will write it as
 ```bash
 ~> 
 ```
+
+We don't have much to do at the cluster right now, so why not try logging out again? You can do that by typing `exit` or by pressing `Ctrl-d` (the control key together with `d`). The `exit` command will terminate the shell, which will disconnect you from the cluster's end while `Ctrl-d` tells the shell that you will not be sending any more data (the `Ctrl-d` sends a so-called "end of file" signal) which will do the same thing. In either case, the connection the the front end of the cluster is severed and you are now safely back on your own computer, just you and your terminal.
+
+But don't worry. You can always log back in, if you feel bored or lonely.
 
 If you are happy with logging into the cluster using a password, you can skip the next step, but if you prefer to set up the system so it trusts the computer you are currently using, you can create a crypto key for your computer, tell the cluster about it, and in the future the cluster will let you in as long as you are logging in from your current machine.
 
@@ -147,7 +150,8 @@ After all that, you can log into the cluster without providing a password.
 ```
 
 Now that you are here, you could
- - [Try to run a few commands](basic-unix-commands.md) or
- - [Learn about the file struct on a UNIX platform](navigating-file-system.md)
+
+- [Try to run a few commands](basic-unix-commands.md) or
+- [Learn about the file struct on a UNIX platform](navigating-file-system.md)
 
 Knock yourself out!
