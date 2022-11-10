@@ -9,7 +9,7 @@ Tentative schedule:
   - [x] [Cluster architecture (your computer, frontend, nodes, ...)](docs/week-1/architecture.md)
 
 - **Week 02**
-  - [ ] Getting files and software (conda, scp, rsync, wget, git)
+  - [ ] Getting files and software (conda, scp, rsync, wget, git) -- besides git and wget I don't have a lot of experience here, so research is needed.
   - [ ] Editing files (nano, emacs, vi), mount (see files on your own laptop), VSCode (I don't know what it is it can do, but it can apparently work directly on the cluster).
   - [x] [Pipelines (stdin/stdout/pipelines)](docs/week-2/pipelines.md)
   - [x] [Scripts and variables.](docs/week-2/scripts-and-variables.md)
