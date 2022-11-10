@@ -65,6 +65,24 @@ The first thing you should do is to change your password to something you can re
 [USERNAME@fe-open-01 ~]$ change-password
 ```
 
+You should have a single directory in your home, called `birc-hpc`. That is a shared folder for this class. Check that you have it by writing
+
+```bash
+[USERNAME@fe-open-01 ~]$ ls
+birc-hpc
+```
+
+(You actually have more files, and you can see them with `ls -a`, but files with names that start with a dot are not shown by `ls` by default. They are usually for various configuration, and we will ignore them for now).
+
+If you do not have the `birc-hpc` directory, you should contact me. If you have it, feel free to enter it
+
+```bash
+[USERNAME@fe-open-01 ~]$ cd birc-hpc
+[USERNAME@fe-open-01 birc-hpc]$
+```
+
+and have a look around. Each of us have a subdirectory inside `birc-hpc`--mine is `mailund`--and these are set up such that other group members cannot see your personal files. There are other directories for shared data, that you can all access.
+
 I will soon grow tired of writing
 
 ```bash
