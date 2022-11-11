@@ -12,11 +12,30 @@ All you have is a terminal that you can use to send commands and see the results
 
 When you are on the cluster, you have an entirely different file system at your disposal. Most of it you cannot see, though; users are protected from each other, and there are limits to which part of the file system you can access. On the cluster, many projects operate on confidential and restricted data, so the system is set up such that all files are hidden from other users by default, and [you have to set up project directories accessible by multiple users explicitly](https://genome.au.dk/docs/projects-and-accounting) if you plan to collaborate.
 
-**FIXME: will there be one for the class?**
+At this point, unless you had an account at GenomeDK before the class started, there should be one project folder in your home directory, `birc-hpc`. Well, it isn't quite a directory, but a so-called "soft link" that points to the directory `/projects/birc-hpc/`. Soft links are like short cuts, and the `birc-hpc` in your home directory will work just as a directory in almost all circumstances. An exception is if you want to move it to somewhere else, for example, if you create a subdirectory for your projects
+
+```bash
+~> mkdir my-projects
+~> mv birc-hpc/ my-projects
+mv: cannot move ‘birc-hpc/’ to ‘projects/birc-hpc’: Not a directory
+```
+
+This is a quirk of `mv` and soft links. If you leave out the `/` at the end of `birc-hpc/` then it will work.
+
+```bash
+~> mv birc-hpc projects/
+‘birc-hpc’ -> ‘projects/birc-hpc’
+```
+
+You don't need to move the directory if you do not want to. It sits fine where it is for now. But some day you might want to move project directories, so I thought I should tell you about this weird issue.
+
+You use project directories to share data in a group, and we will use `birc-hpc` for that. All members of a group can enter the project directory, so you can share files there. If you have files that you want to put in a project directory, but that you don't want everyone to see, you can always set the permission bits accordingly.
+
+We will also use these groups when we submit jobs to the cluster at large, as it is through these that users are charged for the resources they use. You don't have to use a project to run jobs, but the quota you have as a single user is quite limited, so you generally want to run jobs on a quota where you have more resources (that someone is paying for, so don't go crazy unless you want to hand over your credit card at the end of class).
 
 You can read more about projects [here](https://genome.au.dk/docs/projects-and-accounting/).
 
-Anyway, you are sitting at your computer, typing in commands in the terminal; these commands are then sent via `ssh` to the bash shell on the cluster's front end; the shell executes them and then sends the result back. Your computer and terminal are only there to show you what is going on at the other end, and everything that happens when you run programs happens at the cluster's end.
+Anyway, back on topic. You are sitting at your computer, typing in commands in the terminal; these commands are then sent via `ssh` to the bash shell on the cluster's front end; the shell executes them and then sends the result back. Your computer and terminal are only there to show you what is going on at the other end, and everything that happens when you run programs happens at the cluster's end.
 
 At that end, however, there are more computers than just the front end. A lot more. Which is why clusters are interesting. The front end is a powerful computer, likely much more powerful than your laptop, but alone it couldn't service all the jobs we want to run on the cluster. It doesn't have to, though, and if you treat it right, it shouldn't have to either. Behind the front end is a host of other computers, called *nodes* in cluster-lingo, and those are here to serve your computational needs.
 
