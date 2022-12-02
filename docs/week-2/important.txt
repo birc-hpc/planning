@@ -1,3 +1,0 @@
-analysis1/results.txt
-analysis2/experiments-1.txt
-analysis2/experiments-2.txt
