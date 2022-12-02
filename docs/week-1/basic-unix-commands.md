@@ -2,8 +2,6 @@
 
 The basic interaction with all shells involves typing something into a *prompt*, the text highlighted in the figure below.
 
-**FIXME:** Make a picture of a shell as they will see it on the cluster.
-
 The prompt is what the shell writes to you, to indicate that it is ready to take the next command. To the right of it is your cursor, and there you can type in your commands. When you interact with your shell, you will write a command at the prompt and then hit ENTER. (This should be familiar to most of you). Then the shell will interpret what you wrote, execute the command you gave it, and print the result.
 
 Prompts can be configured, so they look differently depending on which machine you are on, which jobs you are currently running, and a host of other factors, so I will not attempt to guess what the prompt will look like for you. The default on GenomeDK will be the host name in square brackets followed by a `$`, so for example

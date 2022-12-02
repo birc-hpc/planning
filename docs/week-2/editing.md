@@ -1,12 +1,14 @@
 # Editing files on the cluster
 
+So, you are sitting with your own computer, and all the files that the cluster can see are sitting across the Internet at another computer. How do you edit them, if that is something you are wont to do?
+
 ## Editors on the cluster
 
- (nano, emacs, vi), mount (see files on your own laptop), VSCode (I don't know what it is it can do, but it can apparently work directly on the cluster).
+You have several options. The simplest is to use an editor through the terminal. There are several editors available, and you invoke them like any other command. [emacs](https://www.gnu.org/software/emacs/), [vi](https://www.guru99.com/the-vi-editor.html), or [nano](https://www.nano-editor.org) are popular choices, but they are not as easy to use as editors you are familiar with. When you interact with them through the `ssh` connection between your terminal and the shell on GenomeDK, you do not have the graphical user interface you are used to, so selecting text with your mouse/trackpad, or clicking on the text to move the cursor, are not something you can do. It is worth getting to know one of these editors for quickly editing files, but it is unlikely that any of these will ever be your first choice.
 
 ## Mounting the cluser's file system on your own computer
 
-If you, like I quickly do, get tired of editing files through a shells limited capabilities, you can also *mount* the cluster's file system on your own computer.
+Another choice is to connect the cluster file system to your own. You can do this by "mounting" the file system over there to a point at your own file system, and after that, the cluster's file system will appear as if a part of your local file system. (It will be a little slower to work with, so this is not something you want to use for processing very large files, but it will essentially work as if you have local files. For editing small text files, it works like a charm).
 
 Mounting file systems is part of the UNIX architecture. In UNIX, unlike e.g. Windows, you do not operate with different drives, and instead you have one big hunking file system that may span multiple physical disks. It is how the large number of user and project directories are distributed on multiple disks on a large system such as GenomeDK, and we can use it to our advantage as well.
 
@@ -97,3 +99,13 @@ The mounting command, `mount_gdk`, tries to create the mount directory if it doe
 Anyway, while the cluster is mounted this way, you can access all the files you have on the cluster as if they were on your own file system. Not quite as fast, I will admit that, but a hell of a lot easier than if you had to edit files using terminal editors.
 
 ## Working with a remote VS Code
+
+A third option is to use an editor that can directly connect to files over `ssh`. The [Visual Studio Code](https://code.visualstudio.com) editor, for example, can do this. If you use it, invoke the Command Palette (⇧⌘P on macOS or Ctrl-Shift-P on Windows/Linux) and type "Remote-SSH: Connect to host...". Pick "Add New SSH Host..." and type in `USERNAME@login.genome.au.dk` where `USERNAME` is your username on the cluster. That will configure the remote host, and if you later pick the "Configure SSH Hosts..." option you should see something like this:
+
+```text
+Host login.genome.au.dk
+  HostName login.genome.au.dk
+  User USERNAME
+```
+
+Once the remote host is configured, you can pick "Remote-SSH: Connect to host..." again, select `login.genome.au.dk`, and VS Code will open a new window for your connection to the cluster. In the side-bar on the left, under files, you will see the files you have on the cluster, and you can open an edit them as if they were present on your laptop.
