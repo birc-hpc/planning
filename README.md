@@ -10,7 +10,7 @@ Tentative schedule:
 
 - **Week 02**
   - [ ] Getting files and software (conda, scp, rsync, wget, git) -- besides git and wget I don't have a lot of experience here, so research is needed.
-  - [ ] [Editing files](docs/week-2/editing.md)
+  - [x] [Editing files](docs/week-2/editing.md)
   - [x] [Pipelines (stdin/stdout/pipelines)](docs/week-2/pipelines.md)
   - [x] [Scripts and variables.](docs/week-2/scripts-and-variables.md)
 
